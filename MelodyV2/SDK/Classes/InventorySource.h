@@ -31,4 +31,44 @@ public:
     InventorySourceType inventorySourceType; // 0x0
     int containerID; // 0x4
     InventorySourceFlags inventorySourceFlags; // 0x8
+
+
+
+
+
+
+	enum class Type {
+		Invalid = -1,
+		Container,
+		Global,
+		WorldInteraction,
+		Creative,
+		UntrackedInteractionUI = 100,
+		NotImplemented = 99999
+	};
+
+	enum class Flags {
+		NoFlag = 0,
+		WorldInteraction_Random = 1
+	};
+
+	Type type = Type::Invalid;
+	ContainerID container = ContainerID::Invalid;
+	Flags flags = Flags::NoFlag;
+
+
+	InventorySource() = default;
+	InventorySource(ContainerID id) : container(id) {}
+	InventorySource(Type type) : type(type) {}
+	InventorySource(Type type, Flags flags) : type(type), flags(flags) {}
+	InventorySource(Type type, ContainerID id) : type(type), container(id) {}
+
+	inline bool operator==(InventorySource const& rhs) const {
+		return ((this->type == rhs.type) &&
+			(this->container == rhs.container) &&
+			(this->flags == rhs.flags));
+	}
+	inline bool operator!=(InventorySource const& rhs) const {
+		return !(*this == rhs);
+	}
 };

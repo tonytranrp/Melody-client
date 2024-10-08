@@ -89,6 +89,7 @@ public:
 public:
 	inline const Category& getCategory() { return this->category; }
 	inline const int getKeybind() { return this->keybind; }
+	inline const int setKeybind(int keyints) { return this->keybind = keyints; }
 	inline std::vector<Setting*>* getSettings() { return &this->settingList; }
 	Module(const std::string& mName, const std::string& des, Category c = Category::UNKNOW, int k = 0x0);
 protected:

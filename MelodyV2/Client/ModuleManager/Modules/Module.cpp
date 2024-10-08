@@ -96,6 +96,7 @@ void Module::onSaveConfig(json* currentConfig) {
             break;
         }
     }
+    obj["friend"] = TargetUtils::Friend;
     (*currentConfig)[getModuleName()] = obj;
 }
 
@@ -107,6 +108,10 @@ void Module::onLoadConfig(json* config) {
         if (obj.contains("enabled")) {
             enabled = obj["enabled"].get<bool>();
         }
+        if (obj.contains("friend")) {
+            TargetUtils::Friend = obj["friend"].get<std::vector<std::string>>();
+        }
+
 
         for (Setting* setting : this->settingList) {
             if (obj.contains(setting->settingName)) {

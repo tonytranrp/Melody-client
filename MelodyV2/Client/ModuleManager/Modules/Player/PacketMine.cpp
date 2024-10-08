@@ -11,7 +11,7 @@ PacketMine::PacketMine() : Module("PacketMine", "NULL", Category::PLAYER) {
 	addEnumSetting("Break Mode", "NULL", { "Auto", "Keybind" }, &breakMode);
 	addKeybindSetting("Break keybind", "NULL", &breakKeybind);
 }
-
+Vec3<float> possrot;
 void PacketMine::setBreakPos(const Vec3<int>& bPos, uint8_t f) {
 	GameMode* gm = mc.getGameMode();
 	if (gm != nullptr) gm->destroyProgress = 0.f;
@@ -20,6 +20,7 @@ void PacketMine::setBreakPos(const Vec3<int>& bPos, uint8_t f) {
 }
 
 void PacketMine::Reset() {
+	possrot = Vec3<float>(0, 0, 0);
 	setBreakPos(Vec3<int>(0, 0, 0), -1);
 }
 float lastDestroyRate = 0.f;
@@ -74,13 +75,12 @@ void PacketMine::onNormalTick(Actor* actor) {
 		}
 		std::pair<int, float> bestSlot = getBestPickaxeSlot(block);
 		if (gm->destroyProgress < 1.f) {
-
 			isbeingmine = true;
+			setIsMining(true);
 			if (silenSwitch) gm->destroyProgress += bestSlot.second;
 			else gm->destroyProgress += gm->getDestroyRate(block);
 			if (gm->destroyProgress > 1.f) gm->destroyProgress = 1.f;
 		}
-
 		else {
 			if (breakMode == 1) {
 				if (breakKeybind == 0x0) return;
@@ -92,7 +92,13 @@ void PacketMine::onNormalTick(Actor* actor) {
 				MobEquipmentPacket pk(localPlayer->getRuntimeID(), localPlayer->getPlayerInventory()->inventory->getItemStack(bestSlot.first), bestSlot.first, bestSlot.first);
 				mc.getClientInstance()->loopbackPacketSender->sendToServer(&pk);
 			}
+
+			bool oldIsDestroying = mc.getLocalPlayer()->isDestroying;
+			mc.getLocalPlayer()->isDestroying = true;
+			possrot = breakPos.toFloat();
+			setIsMining(true); // Set mining flag to true when mining starts
 			gm->destroyBlock(breakPos, face);
+
 			if (silenSwitch) {
 				mc.getLocalPlayer()->getPlayerInventory()->selectedSlot = oldSlot;
 				if (silentBack) {
@@ -100,22 +106,18 @@ void PacketMine::onNormalTick(Actor* actor) {
 					lastSlot = localPlayer->getPlayerInventory()->selectedSlot;
 				}
 			}
-			
-			if (countinue)
-			{
+			mc.getLocalPlayer()->isDestroying = oldIsDestroying;
+			if (countinue) {
 				gm->destroyProgress = Cspeed;
 			}
-			else
-			{
+			else {
+				setIsMining(false); // Set mining flag to false when mining stops
 				this->Reset();
 			}
-			
-			
 		}
 	}
 	isbeingmine = false;
 }
-
 void PacketMine::onRender(MinecraftUIRenderContext* ctx) {
 	GameMode* gm = mc.getGameMode();
 	LocalPlayer* localPlayer = mc.getLocalPlayer();
@@ -134,6 +136,26 @@ void PacketMine::onRender(MinecraftUIRenderContext* ctx) {
 		RenderUtils::drawBox(aabb, fillColor, lineColor, 0.3f, true, false);
 	}
 }
+void PacketMine::onSendPacket(Packet* packet, bool& shouldCancel) {
+	if (packet->getId() == PacketID::PlayerAuthInput || packet->getId() == PacketID::MovePlayerPacket) {
+		auto* authPacket = reinterpret_cast<PlayerAuthInputPacket*>(packet);
+		auto* movePacket = reinterpret_cast<MovePlayerPacket*>(packet);
+		auto rots = GetRotations(mc.getLocalPlayer()->stateVectorComponent->pos, possrot);
+		if (mc.getLocalPlayer()->isDestroying) {
+			authPacket->ticksAlive = 20;
+			movePacket->tick = 20;
+			movePacket->actorRuntimeID = mc.getLocalPlayer()->getRuntimeID();
+			authPacket->rotation = rots;
+			movePacket->rotation = rots;
+			authPacket->headYaw = rots.y;
+			movePacket->headYaw = rots.y;
+			//char message2[256];  // Adjust the buffer size as needed
+			//sprintf(message2, "id  = ", rots);
+			//mc.DisplayClientMessage(message2);
+		}
+		 
 
+	}
+}
 void PacketMine::onImGuiRender(ImDrawList* drawlist) {
 }

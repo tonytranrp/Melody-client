@@ -14,6 +14,7 @@ void AutoOffhand::onNormalTick(Actor* actor) {
 			ItemStack* itemStack = localPlayer->getPlayerInventory()->inventory->getItemStack(i);
 			if (itemStack != nullptr && itemStack->item != nullptr && itemStack->getItemPtr() != nullptr) {
 				if (itemStack->getItemPtr()->texture_name == ItemID) {
+					
 					localPlayer->setOffhandSlot(itemStack);
 					
 					localPlayer->getPlayerInventory()->inventory->removeItem(i, i);

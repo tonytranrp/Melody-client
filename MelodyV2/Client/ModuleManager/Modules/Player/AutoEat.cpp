@@ -11,6 +11,8 @@ void AutoEat::onNormalTick(Actor* actor) {
 	if (item != nullptr  && item->isFood()) {
 		if (localPlayer->getItemUseDuration() == 0) {
 			gm->baseUseItem(itemStack);
+			//gm->useItem(*itemStack);
+
 		}
 	}
 }

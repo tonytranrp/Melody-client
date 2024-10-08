@@ -5,6 +5,8 @@
 #include "WeakPtr.h"
 #include <string>
 
+#include "../Signatures.h"
+
 class Actor;
 class Mob;
 class Player;
@@ -33,6 +35,17 @@ public:
 	BUILD_ACCESS(this, std::string, texture_name, 0x60);
 	BUILD_ACCESS(this, std::vector<HashedString>, recipetags, 0x240);
 	//BUILD_ACCESS(this, WeakPtr<BlockLegacy>, blockLegacy, 0x1C8);
+	//48 89 5c 24 ? 57 48 83 ec ? 48 8b da 48 85 d2
+	__int64 getEnchantLevel(CompoundTag* a2) {
+		using func_t = __int64(__thiscall*)(Item*,CompoundTag*);
+		static func_t func = (func_t)findSig(Sigs::Itemstack::getmaxdamagevalue);
+		return func(this, a2);
+	}
+	Item* setAllowOffhand(bool allow = true) {
+		using func_t = Item * (__thiscall*)(Item*, bool);
+		static func_t func = (func_t)findSig(Sigs::Itemstack::setallowoofhand);
+		return func(this, allow);
+	}
 public:
 
 	virtual ~Item();
@@ -109,7 +122,7 @@ public:
 	virtual void dispense(BlockSource&, Container&, int, Vec3<float> const&, uint8_t);
 	virtual void useTimeDepleted(ItemStack&, Level*, Player*);
 	virtual void releaseUsing(ItemStack&, Player*, int);
-	virtual void getDestroySpeed(ItemStackBase const&, Block const&);
+	virtual float getDestroySpeed(ItemStackBase const&, Block const&);
 	virtual void hurtActor(ItemStack&, Actor&, Mob&);
 	virtual void hitActor(ItemStack&, Actor&, Mob&);
 	virtual void hitBlock(ItemStack&, Block const&, Vec3<int> const&, Mob&);

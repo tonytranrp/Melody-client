@@ -11,4 +11,7 @@ private:
 public:
 	void saveConfig();
 	void loadConfig(std::string configName);
+	void createConfig(const std::string& configName);
+	void deleteConfig(const std::string& configName);
+	void dumpDummyData();
 };

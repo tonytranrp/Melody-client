@@ -23,9 +23,9 @@ AutoCrystal::AutoCrystal() : Module("AutoCrystal", "NULL", Category::COMBAT, 0x0
 	addSlider<float>("Min Break Damage", "NULL", ValueType::FLOAT_T, &minBreakDame, 1.f, 20.f);
 	addSlider<int>("Break Delay", "NULL", ValueType::INT_T, &breakDelay, 0, 20);
 	addBoolCheck("ID Predict", "NULL", &idPredict);
-	
+
 	addSlider<int>("Packets", "NULL", ValueType::INT_T, &packets, 1, 30);
-	addSlider<int>("Ticks", "NULL", ValueType::INT_T, &Ticks, 20, 100);
+	addSlider<int>("Ticks", "NULL", ValueType::INT_T, &Ticks, 0, 100);
 	addSlider<int>("Send Delay", "NULL", ValueType::INT_T, &sendDelay, 0, 20);
 	addBoolCheck("Count crystal", "Crystal speed", &Crystalcounter);
 	addBoolCheck("Render Damages", "NULL", &Damagerender);
@@ -33,9 +33,9 @@ AutoCrystal::AutoCrystal() : Module("AutoCrystal", "NULL", Category::COMBAT, 0x0
 
 }
 std::string AutoCrystal::getModName() {
-	
+
 	return names;
-	
+
 }
 
 bool AutoCrystal::sortCrystalByTargetDame(CrystalStruct a1, CrystalStruct a2) {
@@ -79,46 +79,62 @@ void AutoCrystal::onDisable() {
 bool AutoCrystal::canPlaceCrystal(Vec3<int> placePos) {
 	auto* lp = mc.getLocalPlayer();
 	auto* region = lp->dimension->blockSource;
+
 	auto isAir = [](Block* b) { return b && b->blockLegacy->blockName == "air"; };
 	auto isObsidianOrBedrock = [](Block* b) { return b && (b->blockLegacy->blockName == "obsidian" || b->blockLegacy->blockName == "bedrock"); };
-	if (!(isObsidianOrBedrock(region->getBlock(placePos)) && isAir(region->getBlock(placePos.add(0, 1, 0))) && isAir(region->getBlock(placePos.add(0, 2, 0))))) {// if wanted bedaura need 2 block air so which mean if (air(0,0,0) && the next to it position either it +z or -x or -z or x like 1,0,0)
-		return false;
-	}
-	if (lp->stateVectorComponent->pos.dist(placePos.toFloat().add(0.5f)) > placeRange) return false;
+
+	// Check if the base block is obsidian or bedrock
+	if (!isObsidianOrBedrock(region->getBlock(placePos))) return false;
+
+	// Check if the two blocks above the base block are air
+	if (!isAir(region->getBlock(placePos.add(0, 1, 0))) || !isAir(region->getBlock(placePos.add(0, 2, 0)))) return false;
+
+	// Check if the placement position is within range
+	if (lp->stateVectorComponent->pos.dist(placePos.toFloat().add(0.5f, 0.f, 0.5f)) > placeRange) return false;
+
+	// Define the AABB for the crystal placement area
 	AABB placeAABB{ placePos.toFloat().add(0.f, 1.f, 0.f), placePos.toFloat().add(1.f, 2.f, 1.f) };
+
+	// Check for entity intersections within the placement area
 	for (auto* actor : entityList) {
-		if (actor->getEntityTypeId() == 71)// <- crystal
+		if (actor->getEntityTypeId() == 71) // Skip existing crystals
 			continue;
+
 		AABB targetAABB = *actor->getAABB();
-		if (actor->getEntityTypeId() == 319)// <- all ent 
-		{
+
+		// Slightly expand the AABB for non-crystal entities
+		if (actor->getEntityTypeId() == 319) { // Example entity type
 			targetAABB.lower = targetAABB.lower.sub(Vec3<float>(0.1f, 0.f, 0.1f));
 			targetAABB.upper = targetAABB.upper.add(0.1f, 0.f, 0.1f);
 		}
+
+		// If any entity's AABB intersects with the placement AABB, return false
 		if (targetAABB.intersects(placeAABB))
 			return false;
 	}
-	return true;
 
+	return true;
 }
+
 void AutoCrystal::generatePlacement(Actor* target) {
 	auto* lp = mc.getLocalPlayer();
 	auto* region = lp->dimension->blockSource;
 
-	auto radius = static_cast<int>(7);
+	auto radius = 7;  // Simplified radius to a constant integer
 	auto targetPos = target->stateVectorComponent->pos;
 
-	for (auto x = -radius; x <= radius; x++) {
-		for (auto y = -7; y <= 7; y++) {
-			for (auto z = -radius; z <= radius; z++) {
-				Vec3<int> blockPos(static_cast<int>(targetPos.x + (target->stateVectorComponent->velocity.x * 0.1f)) + x,
-					static_cast<int>(targetPos.y + (target->stateVectorComponent->velocity.y * 0.1f)) + y,
-					static_cast<int>(targetPos.z + (target->stateVectorComponent->velocity.z * 0.1f)) + z);
+	for (int x = -radius; x <= radius; x++) {
+		for (int y = -7; y <= 7; y++) {
+			for (int z = -radius; z <= radius; z++) {
+				Vec3<int> blockPos(
+					static_cast<int>(targetPos.x) + x,
+					static_cast<int>(targetPos.y) + y,
+					static_cast<int>(targetPos.z) + z
+				);
 
 				if (canPlaceCrystal(blockPos)) {
 					CrystalPlacement placement(blockPos, target);
 					if (placement.LpDameTake < maxPlaceDame && placement.TgDameTake >= minPlaceDame) {
-						
 						std::lock_guard<std::mutex> lock(placeListMutex);
 						placeList.push_back(placement);
 					}
@@ -129,6 +145,7 @@ void AutoCrystal::generatePlacement(Actor* target) {
 
 	std::sort(placeList.begin(), placeList.end(), AutoCrystal::sortCrystalByTargetDame);
 }
+
 
 void AutoCrystal::getCrystalActorList(Actor* target) {
 	auto* localPlayer = mc.getLocalPlayer();
@@ -163,21 +180,20 @@ void AutoCrystal::placeCrystal() {
 			auto rotationToPlacement = mc.getLocalPlayer()->stateVectorComponent->pos.CalcAngle(placement.placePos.toFloat());
 			rotAnglePlace = rotationToPlacement;
 			placerot = true;
+			mc.getLocalPlayer()->swing();
+			//InteractPacket inter(InteractAction::LEFT_CLICK, mc.getLocalPlayer()->getRuntimeID(), placement.placePos.toFloat());
+			gm->buildBlock(placement.placePos, Math::random(0, 5), false);
+			//mc.getClientInstance()->loopbackPacketSender->sendToServer(&inter);
+			dam = placement.TgDameTake;
 
-			if (!breaking) {
-				mc.getLocalPlayer()->swing();
-				gm->buildBlock(placement.placePos, Math::random(0, 5), false);
-				dam = placement.TgDameTake;
-				placing = true;
-				break; // Exit loop after placing a crystal
-			}
+			break; // Exit loop after placing a crystal
 		}
 
 		placeDelayTick = 0;
 	}
 	else {
 		rotAnglePlace = {};
-		placerot = false;
+
 		placeDelayTick++;
 	}
 }
@@ -186,7 +202,7 @@ void attack(Actor* target) {
 	if (!mc.getGameMode()->attack(target))  // this returns a bool if it successfully attacks iirc
 		return;
 	lp->swing();
-//	Game.cpsLeft.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
+	//	Game.cpsLeft.push_back(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count());
 }
 void AutoCrystal::breakCrystal() {
 	std::lock_guard<std::mutex> lock(breakListMutex);
@@ -199,21 +215,15 @@ void AutoCrystal::breakCrystal() {
 	if (breakDelayTick >= breakDelay) {
 		highestID = breakList[0].crystalActor->getRuntimeID();
 
-		auto rotationToPlacement = mc.getLocalPlayer()->stateVectorComponent->pos.CalcAngle(breakList[0].crystalActor->stateVectorComponent->pos);
-		rotAngleBreak = rotationToPlacement;
-		breakrot = true;
 
-		if (!placing) {
-			attack(breakList[0].crystalActor);
-			//gm->attack(breakList[0].crystalActor);
-			breaking = true;
-		}
+
+		attack(breakList[0].crystalActor);
 
 		breakDelayTick = 0;
 	}
 	else {
 		rotAngleBreak = {};
-		breakrot = false;
+
 		breakDelayTick++;
 	}
 }
@@ -265,13 +275,21 @@ void AutoCrystal::onNormalTick(Actor* actor) {
 	cleardalist();
 	auto* localPlayer = mc.getLocalPlayer();
 	auto* level = localPlayer->getLevel();
-	//static PacketMine* blockReachMod = (PacketMine*)client->moduleMgr->getModule("PacketMine");
-	//if (!blockReachMod->isbeingmine) return;
+	static PacketMine* blockReachMod = (PacketMine*)client->moduleMgr->getModule("PacketMine");
+
 	if (!level || !localPlayer->dimension->blockSource) return;
 
 	auto* gm = mc.getGameMode();
 	auto* plrInv = localPlayer->getPlayerInventory();
 	auto* inv = plrInv->inventory;
+
+	// Check if PacketMine is actively mining and eating
+	auto* itemStack = localPlayer->getCarriedItem();
+	auto* item = itemStack->getItemPtr();
+	if (item != nullptr && item->isFood()) {
+		if (localPlayer->getItemUseDuration() > 0) return;
+	}
+	if (blockReachMod->getIsMining()) return;
 
 	// Get the initial crystal count
 	int initialCrystalsAmount = inv->getItemStack(getCrystal())->stackCount;
@@ -281,13 +299,11 @@ void AutoCrystal::onNormalTick(Actor* actor) {
 		if (TargetUtils::isTargetValid(target, Mob) &&
 			localPlayer->stateVectorComponent->pos.dist(target->stateVectorComponent->pos) < targetRange) {
 			targetList.push_back(target);
-			//formodnames.push_back(target);
-			
 		}
 	}
 
 	if (targetList.empty()) return;
-	
+
 	std::sort(targetList.begin(), targetList.end(), AutoCrystal::sortEntityByDist);
 	float distance = 0;
 	std::string namess;
@@ -309,6 +325,7 @@ void AutoCrystal::onNormalTick(Actor* actor) {
 	{
 		distance = 0;
 	}
+	currenttarget = targetList[0];
 	names = std::string("[") + namess + std::string(",") + std::string(std::to_string(distance)) + std::string("]");
 	if (autoBreak) getCrystalActorList(targetList[0]);
 
@@ -322,6 +339,7 @@ void AutoCrystal::onNormalTick(Actor* actor) {
 	if (isHoldingCrystal()) {
 		crystalSpeed = dam;
 		prevCrystalsAmount = inv->getItemStack(plrInv->selectedSlot)->stackCount;
+		localPlayer->addExperience(1);
 		placeCrystal();
 		breakCrystal();
 		if (idPredict) breakIdPredictCrystal();
@@ -333,24 +351,14 @@ void AutoCrystal::onSendPacket(Packet* packet, bool& shouldCancel) {
 	if (packet->getId() == PacketID::PlayerAuthInput || packet->getId() == PacketID::MovePlayerPacket) {
 		auto* authPacket = reinterpret_cast<PlayerAuthInputPacket*>(packet);
 		auto* movePacket = reinterpret_cast<MovePlayerPacket*>(packet);
-		if (placerot) {
-			authPacket->ticksAlive = Ticks;
-			movePacket->tick = Ticks;
-			movePacket->actorRuntimeID = mc.getLocalPlayer()->getRuntimeID();
-			authPacket->rotation = rotAnglePlace;
-			movePacket->rotation = rotAnglePlace;
-			authPacket->headYaw = rotAnglePlace.y;
-			movePacket->headYaw = rotAnglePlace.y;
-		}
-		else if (breakrot) {
-			authPacket->ticksAlive = Ticks;
-			movePacket->tick = Ticks;
-			movePacket->actorRuntimeID = mc.getLocalPlayer()->getRuntimeID();
-			authPacket->rotation = rotAngleBreak;
-			movePacket->rotation = rotAngleBreak;
-			authPacket->headYaw = rotAngleBreak.y;
-			movePacket->headYaw = rotAngleBreak.y;
-		}
+		authPacket->ticksAlive = Ticks;
+		movePacket->tick = Ticks;
+		movePacket->actorRuntimeID = mc.getLocalPlayer()->getRuntimeID();
+		authPacket->rotation = rotAnglePlace;
+		movePacket->rotation = rotAnglePlace;
+		authPacket->headYaw = rotAnglePlace.y;
+		movePacket->headYaw = rotAnglePlace.y;
+
 
 
 	}
@@ -370,7 +378,7 @@ void AutoCrystal::onSendPacket(Packet* packet, bool& shouldCancel) {
 	}
 }
 
-/*void AutoCrystal::onRender(MinecraftUIRenderContext* renderCtx) {
+void AutoCrystal::onRender(MinecraftUIRenderContext* renderCtx) {
 	int placed = 0;
 	for (CrystalPlacement& placement : placeList) {
 		Vec3<float> drawboxCenter = placement.placePos.toFloat().add(0.5f, 1.5f, 0.5f);
@@ -379,7 +387,7 @@ void AutoCrystal::onSendPacket(Packet* packet, bool& shouldCancel) {
 
 		if (placed >= multiPlace) break;
 	}
-} */
+}
 void AutoCrystal::onImGuiRender(ImDrawList* d) {
 	LocalPlayer* lp = mc.getLocalPlayer();
 	if (lp == nullptr) return;
@@ -389,11 +397,8 @@ void AutoCrystal::onImGuiRender(ImDrawList* d) {
 	UIColor mainColor = colorsMod->getColor();
 	int placed = 0;
 	for (CrystalPlacement& placement : placeList) {
-
-
-
 		Vec2<float> pos;
-		if (ImGuiUtils::worldToScreen(placement.placePos.toFloat().add(0.f, 0.75f, 0.f), pos)) {
+		if (ImGuiUtils::worldToScreen(placement.placePos.toFloat().add(0.f, 0.5f, 0.f), pos)) {
 			float dist = placement.placePos.toFloat().dist(mc.getLocalPlayer()->stateVectorComponent->pos);
 
 			float size = fmax(0.65f, 3.f / dist);
@@ -404,33 +409,12 @@ void AutoCrystal::onImGuiRender(ImDrawList* d) {
 			float textWidth = ImGuiUtils::getTextWidth(name, textSize);
 			float textHeight = ImGuiUtils::getTextHeight(textSize);
 			Vec2<float> textPos = Vec2<float>(pos.x - textWidth / 2.f, pos.y - textHeight / 2.f);
-			ImGuiUtils::drawBox(placement.placePos.toFloat(), UIColor(0, 255, 255, 50), UIColor(0, 255, 255, 255), 0.3f, true, false);
-			if (Damagerender) ImGuiUtils::drawText(textPos, name, UIColor(255, 255, 255, 255), textSize, true);
-			
-			
+
+			if (Damagerender) {
+				ImGuiUtils::drawText(textPos, name, UIColor(255, 255, 255, 255), textSize, true);
+			}
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-		placed++;
-
-		if (placed >= multiPlace) break;
-
-
-
-
-
-
-		
+		// Break loop after rendering the current placement
+		break;
 	}
-	
 }

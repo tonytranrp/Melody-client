@@ -16,6 +16,7 @@ public:
 	static void setShadowOffset(float offset) { shadowOffset = offset; }
 	static float getTextWidth(std::string textStr, float textSize = 1.f);
 	static float getTextHeight(float textSize = 1.f);
+	static void drawTextConfig(Vec2<float> textPos, const std::string& textStr, UIColor defaultColor, float textSize, bool shadow);
 	static void drawRectangle(const Vec4<float>& rectPos, UIColor color, float lineWidth = 1.0f, float rounding = 0.0f, ImDrawFlags flags = 0);
 	static void drawRectangle(Vec2<float> pMin, Vec2<float> pMax, UIColor color, float lineWidth = 1.0f, float rounding = 0.0f, ImDrawFlags flags = 0);
 	static void fillRectangle(Vec4<float> rectPos, UIColor color, float rounding = 0.0f, ImDrawFlags flags = 0);

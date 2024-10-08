@@ -53,7 +53,21 @@ void RenderUtils::drawText(const Vec2<float>& textPos, std::string textStr, MC_C
 	TextMeasureData textMeasure(textSize, shadow);
 	renderCtx->drawText(mcFont, tPos, &textStr, &color, alpha, 0, &textMeasure, &caretMeasureData);
 }
+void RenderUtils::flushImage(MC_Color color, float alpha)
+{
+	static HashedString flushString = HashedString(0xA99285D21E94FC80, "ui_flush");
+	renderCtx->flushImages(color, alpha, flushString);
+}
+void RenderUtils::renderImage(std::string filePath, Vec4<float> rectPosition, Vec2<float> uvPos, Vec2<float> uvSize, Type type)
+{
+	ResourceLocation location = ResourceLocation(filePath, type);
 
+	location = ResourceLocation(filePath, type);
+	TextureData* textureData = new TextureData();
+	renderCtx->getTexture(textureData, &location);
+
+	renderCtx->drawImage(textureData, Vec2<float>(rectPosition.x, rectPosition.y), Vec2<float>(rectPosition.z - rectPosition.x, rectPosition.w - rectPosition.y), uvPos, uvSize);
+}
 float RenderUtils::getTextWidth(const std::string& textStr, float textSize) {
 	TextHolder text(textStr);
 	return renderCtx->getLineLength(mcFont, &text, textSize, false);

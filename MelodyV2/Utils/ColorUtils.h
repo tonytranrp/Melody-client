@@ -100,6 +100,9 @@ struct UIColor {
 
 		return UIColor(static_cast<int>(r * 255), static_cast<int>(g * 255), static_cast<int>(b * 255), 255);
 	}
+	ImU32 toImU32() const {
+		return IM_COL32(r, g, b, a);
+	}
 	MC_Color toMC_Color() {
 		return MC_Color((float)this->r / 255.f, (float)this->g / 255.f, (float)this->b / 255.f, (float)this->a / 255.f);
 	}

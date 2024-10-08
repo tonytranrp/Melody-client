@@ -6,3 +6,5 @@
 #include "libhat/Process.hpp"
 #include "libhat/Signature.hpp"
 #include "libhat/Scanner.hpp"
+#include "libhat/Access.hpp"
+#include "libhat/Traits.hpp"

@@ -16,6 +16,7 @@
 #include "Hooks/Others/GetGammaHook.h"
 #include "Hooks/Others/HIDControllerHook.h"
 #include "Hooks/Others/HurtColorHook.h"
+#include "Hooks/Others/GlintColorHook.h"
 #include "Hooks/Others/RenderLevelHook.h"
 #include "Hooks/Others/ServerTickBlockBreakingHook.h"
 #include "Hooks/Others/onContainerScreenControllerTickEventHook.h"
@@ -23,12 +24,14 @@
 #include "Hooks/Mob/GetCurrentSwingDurationHook.h"
 
 #include "Hooks/Actor/ActorGetBodyYawHook.h"
+#include "Hooks/Actor/ActorServerRots.h"
 #include "Hooks/Actor/ActorGetHeadRotHook.h"
 #include "Hooks/Actor/ActorNormalTickHook.h"
 #include "Hooks/Actor/ActorIsOnFireHook.h"
 #include "Hooks/Actor/ActorShouldRenderHook.h"
 #include "Hooks/Actor/ActorLerpMotionHook.h"
 #include "Hooks/Actor/ActorSwingHook.h"
+#include "Hooks/Actor/ActorSlowDownHook.h"
 
 #include "Hooks/GameMode/GameModeStartDestroyBlockHook.h"
 #include "Hooks/GameMode/GameModeStopDestroyBlockHook.h"
@@ -40,7 +43,9 @@ void HookManager::init() {
 	SetUpAndRenderHook::init();
 	KeyMapHook::init();
 	KeyMouseHook::init();
+	GetGlintColorHook::init();
 	CauseHurtHook::init();
+	//ActorServerRots::init();
 	FontDrawTransformedHook::init();
 	GetCameraModeHook::init();
 	GetFovHook::init();
@@ -53,6 +58,7 @@ void HookManager::init() {
 	onContainerScreenControllerTickEventHook::init();
 	//ServerTickBlockBreakingHook::init(); // Dinh dung func nay lam Packetmine ma no ncc
 	GetCurrentSwingDurationHook::init();
+	ActorSlowDownHook::init();
 
 	// Actor Vtables
 	{ 

@@ -13,6 +13,7 @@ namespace Sigs {
         extern const hat::signature_view sendKey;
     }
     namespace packet {
+        extern const hat::signature_view respawnpacket;
         extern const hat::signature_view ModEquipmentPacket;
         extern const hat::signature_view AnimatePacket;
         extern const hat::signature_view MobEffectPacket;
@@ -41,6 +42,9 @@ namespace Sigs {
         extern const hat::signature_view createMaterial;
     }
     namespace actor {
+        
+        extern const hat::signature_view isonground;
+        extern const hat::signature_view setonground;
         extern const hat::signature_view getNameTag;
     }
     namespace player {
@@ -61,15 +65,23 @@ namespace Sigs {
         extern const hat::signature_view ContainerScreenController_tick;
     }
     namespace inventorytransactionmanager {
+        extern const hat::signature_view addAction1;
         extern const hat::signature_view addAction;
     }
 
     namespace Itemstack
     {
+        extern const hat::signature_view setallowoofhand;
+        extern const hat::signature_view getmaxdamagevalue;
         extern const hat::signature_view Dropslot;
         extern const hat::signature_view Emptyitemstack;
     }
     namespace hook {
+        extern const hat::signature_view glintscolorhook;
+        extern const hat::signature_view mobrotationhook;
+        extern const hat::signature_view Headrotationcomponemt;
+        extern const hat::signature_view ServerRotsHook;
+        extern const hat::signature_view NoSlowDownHook;
         extern const hat::signature_view GetFogColorHook;
         extern const hat::signature_view KeyMapHook;
         extern const hat::signature_view ShouldRender;

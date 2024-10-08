@@ -1,5 +1,6 @@
 #pragma once
 #include "Classes/ClientInstance.h"
+#include "Classes/Level.h"
 #include "Classes/LocalPlayer.h"
 #include "Classes/HIDController.h"
 #include "MCTextFormat.h"
@@ -13,6 +14,7 @@ public:
 	inline void setClientInstance(ClientInstance* ci) { this->clientInstance = ci; }
 	inline HIDController* getHIDController() { return this->hidController; }
 	inline void setHIDController(HIDController* Hid) { this->hidController = Hid; }
+	inline Level* getLevel() { return this->clientInstance->minecraft->getlevel(); }
 	inline LocalPlayer* getLocalPlayer() { return clientInstance->getLocalPlayer(); }
 	inline GameMode* getGameMode() {
 		if (getLocalPlayer() == nullptr) return nullptr;

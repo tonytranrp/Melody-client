@@ -58,6 +58,9 @@ void Fly::onNormalTick(Actor* actor) {
         motion.x = 0.0f;
         motion.y = 0.0f;
     }
+    //EntityContext* entitescontext = localPlayer->entityContext;
+    //localPlayer->setonground(entitescontext, true);
+    
     localPlayer->stateVectorComponent->velocity.x = motion.x;
     localPlayer->stateVectorComponent->velocity.z = motion.y;
 

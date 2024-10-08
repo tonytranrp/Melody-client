@@ -1,4 +1,5 @@
 #pragma once
+
 #include <memory>
 #include <MinHook.h>
 #include <Psapi.h>
@@ -15,19 +16,18 @@ public:
 	}
 
 	static uintptr_t findSigLibhat(hat::signature_view sig) {
-		hat::scan_result result = hat::find_pattern(sig, ".text", hat::process::get_process_module());
-		uintptr_t address = reinterpret_cast<uintptr_t>(result.get());
+		const hat::scan_result result = hat::find_pattern(sig, ".text", hat::process::get_process_module());
+		const uintptr_t address = reinterpret_cast<uintptr_t>(result.get());
 		return address;
 	}
 
 	static uintptr_t** getVtableFromSignature(hat::signature_view sig, int offset) {
-		uintptr_t sigOffset = findSigLibhat(sig);
-		if (sigOffset == 0x0) return 0;
-		int finalOffset = *reinterpret_cast<int*>((sigOffset + offset));
-		uintptr_t** signatureOffset = reinterpret_cast<uintptr_t**>(sigOffset + finalOffset + 7);
+		const uintptr_t sigOffset = findSigLibhat(sig);
+		if (sigOffset == 0x0) return nullptr;
+		const int finalOffset = *reinterpret_cast<int*>((sigOffset + offset));
+		auto** signatureOffset = reinterpret_cast<uintptr_t**>(sigOffset + finalOffset + 7);
 		return signatureOffset;
 	}
-
 	static inline uintptr_t getFuncFromCall(uintptr_t address) {
 		if (address == 0) return 0;
 		return address + 1 + 4 + *(int*)(address + 1); // Trong smart code
@@ -41,7 +41,7 @@ public:
 
 	static void CreateHook(const char* name, uintptr_t address, void* func, void* OriginFunc) {
 		if (!address) {
-			logF("[%s] Invalid address!", name);
+			logF("[%s] Invalid address!", name); 
 			return;
 		}
 		if (MH_CreateHook((void*)address, func, reinterpret_cast<LPVOID*>(OriginFunc)) != MH_OK) {
@@ -96,6 +96,22 @@ template <typename Ret, typename Type> Ret& direct_access(Type* type, size_t off
 
 #define FK(typep) \
 class typep;
+
+
+template <typename TreatAs, typename Pointer>
+constexpr TreatAs& directAccess(Pointer ptr, ptrdiff_t offset) {
+	return *reinterpret_cast<TreatAs*>(reinterpret_cast<uintptr_t>(ptr) + offset);
+}
+
+#define CLASS_FIELD(name, offset, ...)                                                               \
+	__declspec(property(get = GET_FIELD_##name, put = SET_FIELD_##name)) __VA_ARGS__ name;           \
+	__VA_ARGS__& GET_FIELD_##name() const { return directAccess<__VA_ARGS__>(this, offset); } \
+	template <typename T>                                                                            \
+	void SET_FIELD_##name(const T& value) { directAccess<__VA_ARGS__>(this, offset) = value; }
+
+
+
+
 
 #define FAKE_FIELD(type, name)                                                                                       \
 AS_FIELD(type, name, get##name);                                                                                     \

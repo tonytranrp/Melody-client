@@ -9,6 +9,11 @@ class RenderUtils {
 private:
 	static inline bool init = false;
 public:
+	enum Type
+	{
+		INTERNAL = 0,
+		EXTERNAL = 1,
+	};
 	static inline MinecraftUIRenderContext* renderCtx = nullptr;
 	static inline ScreenContext* screenContext2D = nullptr;
 	static inline ScreenContext* screenContext3D = nullptr;
@@ -37,4 +42,6 @@ public:
 	static bool DrawAABB(const AABB& aabb, ImU32 espCol, float thickness = 2.0f);
 	static bool DrawBlock(Vec3<int>& blockPos, ImU32 color, float thickness = 2.0f);
 	static bool worldToScreen(const Vec3<float>& worldPos, Vec2<float>& screenPos);
+	static void renderImage(std::string filePath, Vec4<float> rectPosition, Vec2<float> uvPos = Vec2<float>(0.f, 0.f), Vec2<float> uvSize = Vec2<float>(1.f, 1.f), Type type = EXTERNAL);
+	static void flushImage(MC_Color color = MC_Color(255, 255, 255), float alpha = 1.f);
 };

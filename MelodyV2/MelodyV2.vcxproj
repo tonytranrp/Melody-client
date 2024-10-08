@@ -168,7 +168,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;MELODYV2_EXPORTS;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;MELODYV2_EXPORTS;NOMINMAX;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;_WIN32_WINNT=0x0A00;ASIO_STANDALONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -193,19 +193,32 @@
   <ItemGroup>
     <ClCompile Include="Client\Client.cpp" />
     <ClCompile Include="Client\CommandManager\CommandManager.cpp" />
-    <ClCompile Include="Client\CommandManager\Commands\PrefixCommand.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\Baritone\Baraton.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\Test\Test.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\Friend\Friend.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\ItemId\ItemId.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\IRC\IRCom.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\PlayerList\PlayerList.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\Bind\BindCommand.cpp" />
+    <ClCompile Include="Client\CommandManager\Commands\Save\SaveCommand.cpp" />
     <ClCompile Include="Client\ConfigManager\ConfigManager.cpp" />
     <ClCompile Include="Client\HookManager\HookManager.cpp" />
     <ClCompile Include="Client\HookManager\Hooks\DirectX\DirectXHook.cpp" />
     <ClCompile Include="Client\ModuleManager\ModuleManager.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\ArrayList.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Client\PlayerListMenu.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\Clients.cpp" />
+	<ClCompile Include="Client\ModuleManager\Modules\Client\ConfigMenu.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Client\Spotify.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\ClickGui.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\Colors.cpp" />
+	<ClCompile Include="Client\ModuleManager\Modules\Client\GlintColor.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\CustomFont.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\HUD.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Client\Notifications.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Combat\AutoTntSpammer.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\AutoCrystal.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Combat\AutoMine.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\Reach.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\Killaura.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\GravityAura.cpp" />
@@ -214,19 +227,26 @@
     <ClCompile Include="Client\ModuleManager\Modules\Misc\Timer.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Misc\Disabler.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Misc\AntiInvis.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Misc\AutoTools.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Misc\Anticrystal.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Misc\IRC.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Misc\InventoryCleaner.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Module.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Movement\AutoSprint.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Movement\Speed.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Movement\Fly.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Movement\NoSlowDown.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Movement\ElytraFly.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Movement\Phase.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Movement\Clip.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Movement\Velocity.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\ChestStealler.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\AntiAnvil.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Player\OffhandExploit.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\AutoArmor.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Player\AutoRespawn.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\AutoEat.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Player\AntiNigga.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\Regen.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\AutoOffhand.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\BlockReach.cpp" />
@@ -264,21 +284,32 @@
     <ClCompile Include="SDK\Signatures.cpp" />
     <ClCompile Include="Utils\ImGuiUtils.cpp" />
     <ClCompile Include="Utils\RenderUtils.cpp" />
+    <ClCompile Include="Utils\AudioSystem.cpp" />
     <ClCompile Include="Utils\TargetUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client\Client.h" />
     <ClInclude Include="Client\CommandManager\CommandManager.h" />
     <ClInclude Include="Client\CommandManager\Commands\Command.h" />
-    <ClInclude Include="Client\CommandManager\Commands\PrefixCommand.h" />
+    <ClInclude Include="Client\CommandManager\Commands\Baritone\Baraton.h" />
+    <ClInclude Include="Client\CommandManager\Commands\Bind\BindCommand.h" />
+    <ClInclude Include="Client\CommandManager\Commands\IRC\IRCom.h" />
+    <ClInclude Include="Client\CommandManager\Commands\PlayerList\PlayerList.h" />
+    <ClInclude Include="Client\CommandManager\Commands\ItemId\ItemId.h" />
+    <ClInclude Include="Client\CommandManager\Commands\Friend\Friend.h" />
+    <ClInclude Include="Client\CommandManager\Commands\Save\SaveCommand.h" />
+    <ClInclude Include="Client\CommandManager\Commands\Test\Test.h" />
     <ClInclude Include="Client\ConfigManager\ConfigManager.h" />
     <ClInclude Include="Client\HookManager\HooksManager.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorGetBodyYawHook.h" />
+    <ClInclude Include="Client\HookManager\Hooks\Actor\ActorSlowDownHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorGetHeadRotHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorIsOnFireHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorLerpMotionHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorNormalTickHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorShouldRenderHook.h" />
+    <ClInclude Include="Client\HookManager\Hooks\Actor\Actorrenderevent.h" />
+    <ClInclude Include="Client\HookManager\Hooks\Actor\ActorServerRots.h" />
     <ClInclude Include="Client\HookManager\Hooks\Actor\ActorSwingHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\DirectX\DirectXHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\GameMode\GameModeGetPickRangeHook.h" />
@@ -294,6 +325,7 @@
     <ClInclude Include="Client\HookManager\Hooks\Others\GetCameraModeHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\GetFovHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\GetGammaHook.h" />
+    <ClInclude Include="Client\HookManager\Hooks\Others\NineSlicehook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\GetFogColorHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\HIDControllerHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\HurtColorHook.h" />
@@ -301,18 +333,25 @@
     <ClInclude Include="Client\HookManager\Hooks\Others\RenderLevelHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\ItemUseSlowdownHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\SendPacketHook.h" />
+    <ClInclude Include="Client\HookManager\Hooks\Others\GlintColorHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\Others\ServerTickBlockBreakingHook.h" />
     <ClInclude Include="Client\HookManager\Hooks\ScreenView.h" />
     <ClInclude Include="Client\HookManager\Hooks\ScreenView\SetUpAndRenderHook.h" />
     <ClInclude Include="Client\ModuleManager\ModuleManager.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\ArrayList.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Client\Spotify.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Client\PlayerListMenu.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\ClickGui.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\Colors.h" />
+	<ClInclude Include="Client\ModuleManager\Modules\Client\GlintColor.h" />
+	<ClInclude Include="Client\ModuleManager\Modules\Client\ConfigMenu.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\CustomFont.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\HUD.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\Clients.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\Notifications.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\AutoCrystal.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Combat\AutoTntSpammer.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Combat\AutoMine.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\GravityAura.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\Killaura.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\Reach.h" />
@@ -320,25 +359,32 @@
     <ClInclude Include="Client\ModuleManager\Modules\Misc\NoPacket.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Misc\AntiInvis.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Misc\Timer.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Misc\IRC.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Misc\Disabler.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Misc\AutoTools.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Misc\InventoryCleaner.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Misc\Anticrystal.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Module.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\AutoSprint.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Movement\Speed.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\Fly.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Movement\NoSlowDown.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\ElytraFly.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\Phase.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\Clip.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\Velocity.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\AntiAnvil.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Player\OffhandExploit.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\AutoArmor.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\ChestStealler.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Player\AntiNigga.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\AutoEat.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\BlockReach.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\FastEat.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\AutoOffhand.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\PacketMine.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\Regen.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Player\AutoRespawn.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\Scaffold.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\Surround.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\Swing.h" />
@@ -369,9 +415,12 @@
     <ClInclude Include="Libs\ImGui\imstb_textedit.h" />
     <ClInclude Include="Libs\ImGui\imstb_truetype.h" />
     <ClInclude Include="Libs\Json.hpp" />
+    <ClInclude Include="Libs\xor.hpp" />
     <ClInclude Include="Libs\Kiero\kiero.h" />
     <ClInclude Include="Libs\Libhat\libhat.hpp" />
     <ClInclude Include="Libs\Libhat\libhat\Callable.hpp" />
+    <ClInclude Include="Libs\Libhat\libhat\Traits.hpp" />
+    <ClInclude Include="Libs\Libhat\libhat\Access.hpp" />
     <ClInclude Include="Libs\Libhat\libhat\CompileTime.hpp" />
     <ClInclude Include="Libs\Libhat\libhat\Concepts.hpp" />
     <ClInclude Include="Libs\Libhat\libhat\Defines.hpp" />
@@ -379,12 +428,6 @@
     <ClInclude Include="Libs\Libhat\libhat\Process.hpp" />
     <ClInclude Include="Libs\Libhat\libhat\Result.hpp" />
     <ClInclude Include="Libs\Libhat\libhat\Scanner.hpp" />
-
-
-	
-	  
-	  
-	  
     <ClInclude Include="Libs\Libhat\libhat\Signature.hpp" />
     <ClInclude Include="SDK\Classes\ContainerScreenController.h" />
     <ClInclude Include="SDK\Classes\ContainerScreenControllerEvent.h" />
@@ -402,18 +445,15 @@
     <ClInclude Include="SDK\Classes\ClientInstance.h" />
     <ClInclude Include="SDK\Classes\ComplexInventoryTransaction.h" />
     <ClInclude Include="SDK\Classes\Container.h" />
+    <ClInclude Include="SDK\Classes\StrictEntityContext.h" />
     <ClInclude Include="SDK\Classes\Dimension.h" />
     <ClInclude Include="SDK\Classes\FontBitmap.h" />
     <ClInclude Include="SDK\Classes\GameMode.h" />
     <ClInclude Include="SDK\Classes\GuiData.h" />
     <ClInclude Include="SDK\Classes\HashedString.h" />
-    
-    
-
-
-
-	  <ClInclude Include="SDK\Classes\HIDController.h" />
+    <ClInclude Include="SDK\Classes\HIDController.h" />
     <ClInclude Include="SDK\Classes\Inventory.h" />
+    <ClInclude Include="SDK\Classes\Directmovementproxy.h" />
     <ClInclude Include="SDK\Classes\InventoryAction.h" />
     <ClInclude Include="SDK\Classes\InventorySource.h" />
     <ClInclude Include="SDK\Classes\InventoryTransactionManager.h" />
@@ -444,6 +484,7 @@
     <ClInclude Include="SDK\Classes\RootUIControl.h" />
     <ClInclude Include="SDK\Classes\ScreenContext.h" />
     <ClInclude Include="SDK\Classes\ScreenView.h" />
+    <ClInclude Include="SDK\Classes\ActorRotate.h" />
     <ClInclude Include="SDK\Classes\SimpleContainer.h" />
     <ClInclude Include="SDK\Classes\Tessellator.h" />
     <ClInclude Include="SDK\Classes\TextHolder.h" />
@@ -452,6 +493,7 @@
     <ClInclude Include="SDK\Classes\UILayer.h" />
     <ClInclude Include="SDK\Classes\VisualTree.h" />
     <ClInclude Include="SDK\Classes\WeakPtr.h" />
+    <ClInclude Include="SDK\Classes\Moveinputhand.h" />
     <ClInclude Include="SDK\Components\ActorRotationComponent.h" />
     <ClInclude Include="SDK\Components\ActorTypeComponent.h" />
     <ClInclude Include="SDK\Components\AABBShapeComponent.h" />
@@ -461,12 +503,16 @@
     <ClInclude Include="SDK\Components\MobEffectsComponent.h" />
     <ClInclude Include="SDK\Components\RenderPositionComponent.h" />
     <ClInclude Include="SDK\Components\RuntimeIDComponent.h" />
+    <ClInclude Include="SDK\Components\MoveInputComponemt.h" />
     <ClInclude Include="SDK\Components\StateVectorComponent.h" />
+    <ClInclude Include="SDK\Components\ActorHeadRotationComponent.h" />
+    <ClInclude Include="SDK\Components\MobBodyRotationComponent.h" />
     <ClInclude Include="SDK\GameData.h" />
-    
     <ClInclude Include="SDK\MCTextFormat.h" />
     <ClInclude Include="SDK\Signatures.h" />
     <ClInclude Include="Utils\ColorUtils.h" />
+    <ClInclude Include="Utils\AdioSystem.h" />
+    <ClInclude Include="Utils\Internet.h" />
     <ClInclude Include="Utils\TargetUtils.h" />
     <ClInclude Include="Utils\ImGuiUtils.h" />
     <ClInclude Include="Utils\Math.h" />
@@ -486,6 +532,8 @@
     <Import Project="..\packages\native.magic_enum.0.9.5\build\native\native.magic_enum.targets" Condition="Exists('..\packages\native.magic_enum.0.9.5\build\native\native.magic_enum.targets')" />
     <Import Project="..\packages\glm.1.0.1\build\native\glm.targets" Condition="Exists('..\packages\glm.1.0.1\build\native\glm.targets')" />
     <Import Project="..\packages\minhook.1.3.3\build\native\minhook.targets" Condition="Exists('..\packages\minhook.1.3.3\build\native\minhook.targets')" />
+    <Import Project="..\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets" Condition="Exists('..\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets')" />
+    <Import Project="..\packages\cpprestsdk.v142.2.10.15\build\native\cpprestsdk.v142.targets" Condition="Exists('..\packages\cpprestsdk.v142.2.10.15\build\native\cpprestsdk.v142.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -495,5 +543,7 @@
     <Error Condition="!Exists('..\packages\native.magic_enum.0.9.5\build\native\native.magic_enum.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\native.magic_enum.0.9.5\build\native\native.magic_enum.targets'))" />
     <Error Condition="!Exists('..\packages\glm.1.0.1\build\native\glm.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\glm.1.0.1\build\native\glm.targets'))" />
     <Error Condition="!Exists('..\packages\minhook.1.3.3\build\native\minhook.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\minhook.1.3.3\build\native\minhook.targets'))" />
+    <Error Condition="!Exists('..\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cpprestsdk.v141.2.10.12.1\build\native\cpprestsdk.v141.targets'))" />
+    <Error Condition="!Exists('..\packages\cpprestsdk.v142.2.10.15\build\native\cpprestsdk.v142.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cpprestsdk.v142.2.10.15\build\native\cpprestsdk.v142.targets'))" />
   </Target>
 </Project>

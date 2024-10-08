@@ -1,7 +1,11 @@
 #include "Notifications.h"
 #include "../../../Client.h"
+#include <unordered_set>
 
+bool playerjoin = false;
+std::unordered_set<std::string> previousPlayers;
 Notifications::Notifications() : Module("Notifications", "Show notification", Category::CLIENT) {
+	addBoolCheck("Player/join", "Notificcation you if a player has lefts", &playerjoin);
 	addClickMeSetting("Save config", "save the current config");
 }
 
@@ -17,7 +21,45 @@ void Notifications::addNotifBox(std::string message, float duration) {
 	std::shared_ptr<NotificationBox> notif = std::make_shared<NotificationBox>(message, duration);
 	notifList.push_back(notif);
 }
+void Notifications::onNormalTick(Actor* actor) {
+	static Notifications* notificationsMod = (Notifications*)client->moduleMgr->getModule("Notifications");
 
+	if (!notificationsMod->isEnabled() || !playerjoin) return;
+
+	Level* level = mc.getLocalPlayer()->getLevel();
+	if (!level) {
+		notificationsMod->addNotifBox("Unable to access player list.", 3.0f);
+		return;
+	}
+
+	const auto& playerMap = level->getPlayerMap();
+	std::unordered_set<std::string> currentPlayers;
+
+	for (const auto& pair : playerMap) {
+		currentPlayers.insert(pair.second.name);
+	}
+
+	// Check for new players (joins)
+	for (const auto& player : currentPlayers) {
+		if (previousPlayers.find(player) == previousPlayers.end()) {
+			std::string joinMessage = "[Melody] + " + player;
+			notificationsMod->addNotifBox(joinMessage, 3.0f);
+			mc.DisplayClientMessage("[%sMelody%s] %s+ %s", DARK_PURPLE, WHITE, GREEN, player.c_str());
+		}
+	}
+
+	// Check for players who left
+	for (const auto& player : previousPlayers) {
+		if (currentPlayers.find(player) == currentPlayers.end()) {
+			std::string leaveMessage = "[Melody] - " + player;
+			notificationsMod->addNotifBox(leaveMessage, 3.0f);
+			mc.DisplayClientMessage("[%sMelody%s] %s- %s", DARK_PURPLE, WHITE, RED, player.c_str());
+		}
+	}
+
+	// Update previous players list
+	previousPlayers = currentPlayers;
+}
 void Notifications::Render(ImDrawList* drawlist) {
 	if (!client->isInitialized()) return;
 	static Notifications* notifBox = (Notifications*)client->moduleMgr->getModule("Notifications");

@@ -10,6 +10,37 @@ void ImGuiUtils::drawText(Vec2<float> textPos, std::string textStr, UIColor colo
 	if (cFontMod->fontShadow && shadow) drawlist->AddText(nullptr, fontSize * textSize, textPos.add(shadowOffset * textSize).toImVec2(), ImColor((int)(color.r / 5.f), (int)(color.g / 5.f), (int)(color.b / 5.f), color.a), textStr.c_str());
 	drawlist->AddText(nullptr, fontSize * textSize, textPos.toImVec2(), color.toImColor(), textStr.c_str());
 }
+void ImGuiUtils::drawTextConfig(Vec2<float> textPos, const std::string& textStr, UIColor defaultColor, float textSize, bool shadow) {
+	static CustomFont* cFontMod = (CustomFont*)client->moduleMgr->getModule("CustomFont");
+	if (cFontMod->fontShadow && shadow) drawlist->AddText(nullptr, fontSize * textSize, textPos.add(shadowOffset * textSize).toImVec2(), ImColor((int)(defaultColor.r / 5.f), (int)(defaultColor.g / 5.f), (int)(defaultColor.b / 5.f), defaultColor.a), textStr.c_str());
+
+	std::string::const_iterator it = textStr.begin();
+	std::string::const_iterator end = textStr.end();
+	float xOffset = 0.f;
+
+	while (it != end) {
+		if (*it == '^' && std::next(it) != end) {
+			++it;
+			switch (*it) {
+			case '0': defaultColor = UIColor(0, 0, 0, 255); break;      // Reset to black
+			case '1': defaultColor = UIColor(0, 0, 255, 255); break;    // Blue
+			case '2': defaultColor = UIColor(0, 255, 0, 255); break;    // Green
+			case '3': defaultColor = UIColor(255, 255, 0, 255); break;  // Yellow
+			case '4': defaultColor = UIColor(128, 0, 128, 255); break;  // Purple
+				// Add more color codes as needed
+			}
+			++it;
+		}
+		else {
+			std::string segment;
+			while (it != end && *it != '^') {
+				segment += *it++;
+			}
+			drawlist->AddText(nullptr, fontSize * textSize, Vec2<float>(textPos.x + xOffset, textPos.y).toImVec2(), defaultColor.toImColor(), segment.c_str());
+			xOffset += ImGui::GetFont()->CalcTextSizeA(fontSize * textSize, FLT_MAX, -1, segment.c_str()).x;
+		}
+	}
+}
 
 float ImGuiUtils::getTextWidth(std::string textStr, float textSize) {
 	return ImGui::GetFont()->CalcTextSizeA(fontSize * textSize, FLT_MAX, -1, textStr.c_str()).x;

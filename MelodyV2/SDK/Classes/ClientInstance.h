@@ -1,5 +1,6 @@
 #pragma once
 #include "MinecraftGame.h"
+#include "Moveinputhand.h"
 #include "LoopbackPacketSender.h"
 #include "GuiData.h"
 #include "LocalPlayer.h"
@@ -15,6 +16,7 @@ public:
 	BUILD_ACCESS(this, LoopbackPacketSender*, loopbackPacketSender, 0xF0);
 	BUILD_ACCESS(this, GuiData*, guiData, 0x560);
 	BUILD_ACCESS(this, Minecraft*, minecraft, 0xD0);
+	BUILD_ACCESS(this, MoveInputHand*, moveinput, 0x1F0);
 	//BUILD_ACCESS(this, UIProfanityContext*, getProfanityContext, 0xBA0);
 	//BA0
 public:

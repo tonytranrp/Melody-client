@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MinecraftTimer.h"
+#include "Level.h"
 
 class Minecraft {
 private:
@@ -8,4 +9,12 @@ private:
 public:
 	MinecraftTimer* mctimer; //0xD8
 	MinecraftTimer* mcrenderTimer; //0xE0
+	Level* getlevel() {
+		__int64 gamesess = *reinterpret_cast<__int64*>(reinterpret_cast<__int64>(this) + 0x18);
+		if (gamesess) {
+			return **reinterpret_cast<Level***>(gamesess + 48);
+		}
+		else
+			return nullptr;
+	}
 };

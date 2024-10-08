@@ -61,6 +61,19 @@ void DirectXHook::Render(ImDrawList* drawlist) {
 	static ClickGui* clickGuiMod = (ClickGui*)client->moduleMgr->getModule("ClickGui");
 	clickGuiMod->render(drawlist);
 	Notifications::Render(drawlist);
+	static PlayerListMenu* PlayerListMenuMod = (PlayerListMenu*)client->moduleMgr->getModule("PlayerListMenu");
+	if (PlayerListMenuMod->isEnabled()) {
+		PlayerListMenuMod->Render(drawlist);
+	}
+	static Spotify* SpotifyMod = (Spotify*)client->moduleMgr->getModule("Spotify");
+	if (SpotifyMod->isEnabled()) {
+		SpotifyMod->Render(drawlist);
+	}
+	static ConfigMenu* ConfigMenuMod = (ConfigMenu*)client->moduleMgr->getModule("ConfigMenu");
+	if (ConfigMenuMod->isEnabled()) {
+		ConfigMenuMod->Render(drawlist);
+	}
+
 	//ImGui::Text("%i", mc.getLocalPlayer()->getLevel()->getRuntimeActorList().size());
 	//ImGuiUtils::drawText(Vec2<float>(10.f, 6.f), "Melody", UIColor(255, 0, 0, 255), 2.f);
 }

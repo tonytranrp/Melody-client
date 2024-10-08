@@ -23,8 +23,9 @@ private:
 public:
 	Notifications();
 	~Notifications();
+
 	static void addNotifBox(std::string message, float duration);
 	static void Render(ImDrawList* drawlist);
-
+	virtual void onNormalTick(Actor* actor) override;
 	virtual bool isVisible() override;
 };

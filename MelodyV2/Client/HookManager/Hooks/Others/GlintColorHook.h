@@ -1,31 +1,79 @@
-/*#pragma once
+#pragma once
+#include "../../../../SDK/Classes/Options.h"
 #include "../../../../Utils/MemoryUtils.h"
-#include "../../../../SDK/Classes/Actor.h"
-#include "../../../../SDK/Classes/BaseActorRenderContext.h"
-
+#include "../../../../Utils/MemoryUtils.h"
 #include "../../../Client.h"
 
-class GlintColorHook {
+class GetGlintColorHook {
 protected:
-	using func_t = __int64(__fastcall*)(ScreenContext*, BaseActorRenderContext*, Actor*, MC_Color, MC_Color, MC_Color, MC_Color, float, float, float, float, BaseActorRenderContext**, Vec4<float>*, float, unsigned __int8*);
+	using func_t = float* (__thiscall*)(float* , __int64 , int , float* );
 	static inline func_t func;
 
-	static __int64 GlintColorFunc(ScreenContext* screenContext, BaseActorRenderContext* entityContext, Actor* entity, MC_Color overlay, MC_Color changeColor, MC_Color changeColor2, MC_Color glintColor, float uvOffset1, float uvOffset2, float uvRot1, float uvRot2, BaseActorRenderContext** glintUVScale, Vec4<float>* uvAnim, float br, unsigned __int8* lightEmission) { // sub_1428200A0
-		__int64 result = func(a1, a2, a3);
-		static NoHurtcam* noHurtcamMod = (NoHurtcam*)client->moduleMgr->getModule("NoHurtcam");
-		if (noHurtcamMod->isEnabled() && a1 == mc.getLocalPlayer() && a2 == 2) {
-			uintptr_t* v5 = *(uintptr_t**)((__int64)a1 + 0x630);
-			if (v5 != nullptr) {
-				*v5 = 0;
-			}
+	static float* GetGlintColor(float* color, __int64 a2, int a3, float* a4) {
+		static GlintColor* CustomSkyMod = (GlintColor*)client->moduleMgr->getModule("GlintColor");
+		MC_Color rColor = ColorUtils::getRainbowColor(3, 0.5f, 1, 1).toMC_Color();
+
+		if (CustomSkyMod->isEnabled() && CustomSkyMod->night) {
+			color[0] = 0.f;
+			color[1] = 0.f;
+			color[2] = 0.2f;
+			color[3] = 1;
+			return color;
 		}
 
-		return result;
+
+		static float rcolors[4];
+		static float currColor[4];
+
+		if (CustomSkyMod->isEnabled()) {
+			if (CustomSkyMod->custom) {
+				if (rcolors[3] < 1) {
+					rcolors[0] = 1;
+					rcolors[1] = 0.2f;
+					rcolors[2] = 0.2f;
+					rcolors[3] = 1;
+				}
+
+				ColorUtils::RGBtoHSV(rcolors[0], rcolors[1], rcolors[2], rcolors[0], rcolors[1], rcolors[2]);  // perfect code, don't question this
+
+				rcolors[0] += CustomSkyMod->intensity;
+				if (rcolors[0] >= 1) {
+					rcolors[0] = 0;
+				}
+
+				ColorUtils::ColorConvertHSVtoRGB(rcolors[0], rcolors[1], rcolors[2], rcolors[0], rcolors[1], rcolors[2]);
+
+				return rcolors;
+			}
+			else {
+				if (currColor[3] < 1) {
+					currColor[0] = 1;
+					currColor[1] = 0.2f;
+					currColor[2] = 0.2f;
+					currColor[3] = 1;
+				}
+
+				ColorUtils::RGBtoHSV(currColor[0], currColor[1], currColor[2], currColor[0], currColor[1], currColor[2]);  // perfect code, don't question this
+
+				currColor[0] += CustomSkyMod->intensity;
+				if (currColor[0] >= 1) {
+					currColor[0] = 0;
+				}
+
+				ColorUtils::ColorConvertHSVtoRGB(currColor[0], currColor[1], currColor[2], currColor[0], currColor[1], currColor[2]);
+
+				currColor[0] = CustomSkyMod->color.r;
+				currColor[1] = CustomSkyMod->color.g;
+				currColor[2] = CustomSkyMod->color.b;
+
+				return currColor;
+			}
+		}
+		return func(color, a2, a3, a4);
 	}
 public:
 	static void init() {
-		uintptr_t address = findSig(Sigs::hook::GlintColorHook);
-		MemoryUtils::CreateHook("GlintColorHook", address, (void*)&GlintColorHook::GlintColorFunc, (void*)&func);
+		uintptr_t address = findSig(Sigs::hook::glintscolorhook);
+		MemoryUtils::CreateHook("GetGlintColorHook", address, (void*)&GetGlintColorHook::GetGlintColor, (void*)&func);
 	}
 };
-*/

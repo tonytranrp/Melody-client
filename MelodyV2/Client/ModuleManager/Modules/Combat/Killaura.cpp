@@ -1,5 +1,5 @@
 #include "Killaura.h"
-
+#include <cmath> // for std::atan2()
 Killaura::Killaura() : Module("Killaura", "Auto attack players / mobs arround u.", Category::COMBAT) {
 	addSlider<float>("Target Range", "Players/Mobs have range lower than this will be targeted", ValueType::FLOAT_T, &targetRange, 3.f, 12.f);
 	addSlider<float>("Wall Range", "NULL", ValueType::FLOAT_T, &wallRange, 0.f, 12.f);
@@ -16,13 +16,24 @@ Killaura::Killaura() : Module("Killaura", "Auto attack players / mobs arround u.
 }
 
 int Killaura::getBestWeaponSlot() {
-	PlayerInventory* plrInv = mc.getLocalPlayer()->getPlayerInventory();
-	Inventory* inv = plrInv->inventory;
+	auto localPlayer = mc.getLocalPlayer();
+	if (!localPlayer)
+		return -1;
+
+	auto plrInv = localPlayer->getPlayerInventory();
+	if (!plrInv)
+		return -1;
+
+	auto inv = plrInv->inventory;
+	if (!inv)
+		return -1;
+
 	float damage = 0.f;
 	int slot = plrInv->selectedSlot;
+
 	for (int i = 0; i < 9; i++) {
-		ItemStack* itemStack = inv->getItemStack(i);
-		if (itemStack->isValid()) { // or you can do itemStack->getItemPtr()->hasRecipeTag("minecraft:is_sword") for sword find only 
+		auto itemStack = inv->getItemStack(i);
+		if (itemStack && itemStack->isValid()) { // or you can do itemStack->getItemPtr()->hasRecipeTag("minecraft:is_sword") for sword find only 
 			/*
 			* here some step that you can get pick and things 
 			* item->getItemPtr()->hasRecipeTag("minecraft:digger") <- this is how you get like a things that can digs like shovel and picks and axe maybe
@@ -33,7 +44,7 @@ int Killaura::getBestWeaponSlot() {
 			* item->hasRecipeTag("minecraft:is_hoe")<- get hoe like a riel bitch
 			* item->hasRecipeTag("minecraft:is_food") <- get food
 			*/
-			float currentDamage = itemStack->getItemPtr()->getAttackDamage() + (1.25f * itemStack->getEnchantLevel(9));
+			float currentDamage = itemStack->getItemPtr()->getAttackDamage() + (1.25f * itemStack->getEnchantLevel(EnchantID::sharpness));
 			if (currentDamage > damage) {
 				damage = currentDamage;
 				slot = i;
@@ -47,7 +58,7 @@ int Killaura::getBestWeaponSlot() {
 Vec2<float> GetRotations(Vec3<float> playerEyePos, Vec3<float> targetPos) {
 	Vec3<float> delta = targetPos.sub(playerEyePos);
 	float yaw = atan2(delta.z, delta.x) * 180.0f / M_PI;
-	float pitch = atan2(delta.y, sqrt(delta.x * delta.x + delta.z * delta.z)) * 180.0f / M_PI;
+	float pitch = atan2(delta.y, std::sqrt(delta.x * delta.x + delta.z * delta.z)) * 180.0f / M_PI;
 	return { -pitch, yaw - 90 };
 }
 void Killaura::onNormalTick(Actor* actor) {
@@ -123,16 +134,16 @@ void Killaura::onNormalTick(Actor* actor) {
 			}
 			
 
-			rotAngle = GetRotations(localPlayer->stateVectorComponent->pos, targetList[0]->stateVectorComponent->pos.sub(Vec3<int>(0.f, 0.2f, 0.f)));
+			rotAngle = GetRotations(localPlayer->stateVectorComponent->pos, targetList[0]->stateVectorComponent->pos.sub(Vec3<float>(0.f, 0.9f, 0.f)));
 
 			if (rotMode == 2) {
-				//auto haah = inv->getItemStack(oldSlot)->getItemPtr()->gettexture_name();
+				//auto haah = std::to_string(inv->getItemStack(oldSlot)->getItemPtr()->itemId);
 				localPlayer->rotationComponent->rotation = rotAngle;
 				localPlayer->rotationComponent->Set(rotAngle);
 				localPlayer->rotationComponent->oldRotation = *localPlayer->getRotationPrev();
-				/*char message2[256];  // Adjust the buffer size as needed
-				sprintf(message2, "id  = ", haah);
-				mc.DisplayClientMessage(haah.c_str());*/
+				//char message2[256];  // Adjust the buffer size as needed
+				//sprintf(message2, "id  = ", haah);
+				//mc.DisplayClientMessage(haah.c_str());
 
 			}
 
@@ -167,6 +178,7 @@ void Killaura::onImGuiRender(ImDrawList* d) {
 	if (mc.getClientInstance()->getLevelRenderer() == nullptr) return;
 	if (mc.getClientInstance()->getLevelRenderer()->levelRendererPlayer == nullptr) return;
 	if (!mc.canUseMoveKeys()) return;
+
 	LocalPlayer* localPlayer = mc.getLocalPlayer();
 	if (visualRange) {
 		Vec3<float> lpPos = localPlayer->stateVectorComponent->pos;

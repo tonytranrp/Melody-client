@@ -1,10 +1,11 @@
 #pragma once
-
+#include <immintrin.h> // Include for SIMD intrinsics
 #include <algorithm>
-#include <array>
 #include <execution>
 #include <utility>
-
+#include <cstdint>
+#include <iostream>
+#include <array>
 #include "Concepts.hpp"
 #include "Defines.hpp"
 #include "Process.hpp"
@@ -68,9 +69,11 @@ namespace hat {
 
         template<std::integral type, scan_alignment alignment, auto stride = alignment_stride<alignment>>
         inline consteval auto create_alignment_mask() {
+            constexpr size_t numBits = sizeof(type) * 8;
             type mask = 0;
-            for (size_t i = 0; i < sizeof(type) * 8; i += stride) {
-                mask |= (type(1) << i);
+            constexpr size_t numIterations = numBits / stride;
+            for (size_t i = 0; i < numIterations; ++i) {
+                mask |= static_cast<type>(1) << (i * stride);
             }
             return mask;
         }
@@ -80,8 +83,11 @@ namespace hat {
             if constexpr (stride == 1) {
                 return ptr;
             }
-            uintptr_t mod = reinterpret_cast<uintptr_t>(ptr) % stride;
-            return ptr + (mod ? stride - mod : 0);
+            else {
+                uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+                uintptr_t alignedAddr = (addr + (stride - 1)) & ~(stride - 1);
+                return reinterpret_cast<const std::byte*>(alignedAddr);
+            }
         }
 
         template<scan_alignment alignment, auto stride = alignment_stride<alignment>>
@@ -89,9 +95,14 @@ namespace hat {
             if constexpr (stride == 1) {
                 return ptr;
             }
-            uintptr_t mod = reinterpret_cast<uintptr_t>(ptr) % stride;
-            return ptr - mod;
+            else {
+                uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+                uintptr_t alignedAddr = (addr & ~(stride - 1));
+                return reinterpret_cast<const std::byte*>(alignedAddr);
+            }
         }
+
+
 
         template<scan_mode, scan_alignment>
         scan_result find_pattern(const std::byte* begin, const std::byte* end, signature_view signature);
@@ -104,14 +115,19 @@ namespace hat {
             const auto firstByte = *signature[0];
             const auto scanEnd = end - signature.size() + 1;
 
-            for (auto i = begin; i != scanEnd; i = std::find(i, scanEnd, firstByte)) {
-                auto match = std::equal(signature.begin() + 1, signature.end(), i + 1, [](auto opt, auto byte) {
-                    return !opt.has_value() || *opt == byte;
-                    });
-                if (match) {
-                    return i;
+            for (auto i = begin; i != scanEnd; ++i) {
+                if (*i == firstByte) {
+                    auto match = true;
+                    for (size_t j = 1; j < signature.size(); ++j) {
+                        if (signature[j].has_value() && i[j] != *signature[j]) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        return i;
+                    }
                 }
-                i++;
             }
             return nullptr;
         }
@@ -128,9 +144,13 @@ namespace hat {
 
             for (auto i = scanBegin; i != scanEnd; i += 16) {
                 if (*i == firstByte) {
-                    auto match = std::equal(signature.begin() + 1, signature.end(), i + 1, [](auto opt, auto byte) {
-                        return !opt.has_value() || *opt == byte;
-                        });
+                    auto match = true;
+                    for (size_t j = 1; j < signature.size(); ++j) {
+                        if (signature[j].has_value() && i[j] != *signature[j]) {
+                            match = false;
+                            break;
+                        }
+                    }
                     if (match) {
                         return i;
                     }
@@ -138,6 +158,7 @@ namespace hat {
             }
             return nullptr;
         }
+
     }
 
     template<scan_alignment alignment = scan_alignment::X1>
@@ -170,18 +191,26 @@ namespace hat {
 
         const auto begin = std::to_address(beginIt) + offset;
         const auto end = std::to_address(endIt);
-        if (begin >= end) {
+        if (begin >= end || end - begin < signature.size()) {
             return nullptr;
         }
 
-        hat::scan_result result;
-        if LIBHAT_IF_CONSTEVAL{
-            result = detail::find_pattern<detail::scan_mode::Single, alignment>(begin, end, signature);
+        // Convert signature to contiguous memory for faster search
+        std::vector<std::byte> patternBytes;
+        patternBytes.reserve(signature.size());
+        for (const auto& elem : signature) {
+            if (elem.has_value()) {
+                patternBytes.push_back(*elem);
+            }
         }
-        else {
-            result = detail::find_pattern<alignment>(begin, end, signature);
+
+        // Use std::search for optimized searching
+        auto resultIt = std::search(begin, end, patternBytes.begin(), patternBytes.end());
+        if (resultIt != end) {
+            return resultIt - begin;
         }
-        return result.has_result() ? result.get() - offset : nullptr;
+
+        return nullptr;
     }
 }
 

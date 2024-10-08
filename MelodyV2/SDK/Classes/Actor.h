@@ -16,6 +16,8 @@
 #include "../Components/RuntimeIDComponent.h"
 #include "../Components/StateVectorComponent.h"
 #include "../Components/ActorRotationComponent.h"
+#include "../Components/MobBodyRotationComponent.h"
+#include "../Components/ActorHeadRotationComponent.h"
 #include "../Components/Flags/OnGroundFlag.h"
 
 class HashedString;
@@ -24,6 +26,7 @@ class Block;
 class ItemStack;
 enum MaterialType;
 class Player;
+
 
 struct EntityId {
 	uint32_t value;
@@ -34,11 +37,12 @@ class EntityRegistry;
 struct EntityContext {
 	EntityRegistry* registry;
 	EntityId id;
+	
 };
 
 class Actor {
 public:
-	BUILD_ACCESS(this, EntityContext, entityContext, 0x8);
+	BUILD_ACCESS(this, EntityContext*, entityContext, 0x8);
 	BUILD_ACCESS(this, int16_t, hurtTime, 0x22C);
 	BUILD_ACCESS(this, std::shared_ptr<Dimension>, dimension, 0x278);
 	BUILD_ACCESS(this, StateVectorComponent*, stateVectorComponent, 0x2C8);
@@ -93,7 +97,7 @@ public:
 	Vec3<float>* getPosition() {
 		return (Vec3<float>*)*((uintptr_t*)this + 0x59);
 	}
-
+	
 	Vec3<float> getHumanPos() {
 		Vec3<float> targetPos = this->getEyePos();
 
@@ -104,9 +108,13 @@ public:
 	void setPos(Vec3<float> pos) {
 		using func_t = void* (__thiscall*)(Actor*, Vec3<float> const&, const char*);
 		static func_t func = (func_t)(MemoryUtils::getBase() + 0x2648380);
-		func(this, pos, 0);
+		func(this, pos, nullptr);
 	}
-
+	void setonground(EntityContext* a,bool onground) {
+		using func_t = void(__thiscall*)(EntityContext*, bool);
+		static func_t func = (func_t)findSig(Sigs::actor::setonground);
+		return func(a, onground);
+	}
 	Vec2<float>* getRotationPrev() {
 		Vec2<float>* v1 = getRotation();
 		return (Vec2<float>*)(v1 + 0x8);
@@ -121,11 +129,19 @@ public:
 	bool isOnGround() {
 		return getOnGroundFlagComponent();
 	}
-
+	
+	
 	ActorTypeComponent* getActorTypeComponent() {
 		static uintptr_t funcAddr = MemoryUtils::getFuncFromCall(findSig(Sigs::component::getActorTypeComponent));
 		return getComponent<ActorTypeComponent>(funcAddr);
 	}
+	//   Memory::findSig     (    std::string    (    GET_SIG   (    "tryGetPrefix"   )    ) + " " +    GET_SIG   (   "Actor::getMoveInputHandler"    )   )  ;
+	/*MoveInputComponent* getMoveInputHandler() { //??$try_get@UMoveInputComponent
+
+		static uintptr_t sig = MemoryUtils::findSigdll(std::string(GET_SIG("tryGetPrefix")) + " " + GET_SIG("Actor::getMoveInputHandler"));
+
+		return tryGet<MoveInputComponent>(sig);
+	}*/
 	FallDistanceComponent* getFallDistanceComponent() {
 		static uintptr_t funcAddr = MemoryUtils::getFuncFromCall(findSig(Sigs::component::getFallDistanceComponent));
 		return getComponent<FallDistanceComponent>(funcAddr);
@@ -146,15 +162,24 @@ public:
 		static uintptr_t funcAddr = MemoryUtils::getFuncFromCall(findSig(Sigs::component::getActorUniqueIDComponent));
 		return getComponent<ActorUniqueID>(funcAddr);
 	}
+	ActorHeadRotationComponent* getActorHeadRotationComponent() {
+		static uintptr_t funcAddr = MemoryUtils::getFuncFromCall(findSig(Sigs::hook::Headrotationcomponemt));
+		return getComponent<ActorHeadRotationComponent>(funcAddr);
+	}
+	MobBodyRotationComponent* getMobBodyRotationComponent() {
+		static uintptr_t funcAddr = MemoryUtils::getFuncFromCall(findSig(Sigs::hook::mobrotationhook));
+		return getComponent<MobBodyRotationComponent>(funcAddr);
+	}
 	OnGroundFlag* getOnGroundFlagComponent() {
 		static uintptr_t funcAddr = MemoryUtils::getFuncFromCall(findSig(Sigs::component::onGroundFlag));
 		return getComponent<OnGroundFlag>(funcAddr);
 	}
-	uint32_t getEntityTypeId() {
+	uint32_t getEntityTypeId() { //e8 ? ? ? ? 3d ? ? ? ? 89 9d 
 		ActorTypeComponent* component = getActorTypeComponent();
 		if (component == nullptr) return 0;
 		return *(uint32_t*)component;
 	}
+
 	float getFallDistance() {
 		FallDistanceComponent* component = getFallDistanceComponent();
 		if (component == nullptr) return 0.f;
@@ -181,7 +206,9 @@ public:
 		if (component == nullptr) return component->pos;
 		return *(Vec3<float>*)component;
 	}
-	uint64_t getRuntimeID() {
+	
+	
+	uint64_t getRuntimeID() { //sub_142645130 //40 53 48 83 EC 20 8B 41 18 48 8B DA 48 8B 49 10 48 8D 54 24 30 89 44 24 30 E8 ?? ?? ?? ?? 48 85 C0 74 0F
 		RuntimeIDComponent* component = getRuntimeIDComponent();
 		if (component == nullptr) return 0;
 		return *(uint64_t*)component;
@@ -310,7 +337,7 @@ public:
 	virtual void stopSwimming(void);
 	virtual void buildDebugInfo(std::string&);
 	virtual void getCommandPermissionLevel(void);
-	virtual void getDeathTime(void);
+	virtual int32_t getDeathTime(void);
 	virtual bool canBeAffected(enum uint);
 	virtual bool canBeAffectedByArrow(MobEffectInstance const&);
 	virtual void onEffectAdded(MobEffectInstance&);

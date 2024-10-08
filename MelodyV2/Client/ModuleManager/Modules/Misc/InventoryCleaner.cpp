@@ -29,38 +29,17 @@ void InventoryCleaner::onNormalTick(Actor* actor) {
 			for (int n = 0; n < 36; n++) {
 				ItemStack* stack = inv->getItemStack(n);
 				if (stack->item != NULL) {
-					float currentDamage = stack->getItemPtr()->getAttackDamage() + (1.25f * stack->getEnchantLevel(9));
+					float currentDamage = stack->getItemPtr()->getAttackDamage() + (1.25f * stack->getEnchantLevel(EnchantID::sharpness));
 					if (currentDamage > damage) {
 						damage = currentDamage;
 						item = n;
-						if (item != 0) localPlayer->setItemSlot(item, *stack);
+						if (item != 0) inv->swapSlots(item, 1,localPlayer->getInventoryTransactionManager());
 					}
 				}
 			}
 			
 		}
 	}
-
-	/*// Check if should keep certain types of items
-	if (keepTools || keepArmor || keepFood) {
-		for (int i = 0; i < 36; ++i) {
-			ItemStack* itemStack = mc.getLocalPlayer()->getPlayerInventory()->inventory->getItemStack(i);
-			if (itemStack->item != nullptr && !stackIsUseful(itemStack)) {
-				// Check if should keep tools
-				if (!keepTools && (*itemStack->item)->hasRecipeTag("minecraft:digger") || (*itemStack->item)->hasRecipeTag("minecraft:is_sword")) {
-					mc.getLocalPlayer()->getPlayerInventory()->inventory->dropSlot(i);
-				}
-				// Check if should keep armor
-				else if (!keepArmor && (*itemStack->item)->isArmor()) {
-					mc.getLocalPlayer()->getPlayerInventory()->inventory->dropSlot(i);
-				}
-				// Check if should keep food
-				else if (!keepFood && (*itemStack->item)->isFood()) {
-					mc.getLocalPlayer()->getPlayerInventory()->inventory->dropSlot(i);
-				}
-			}
-		}
-	}*/
 }
 
 std::vector<int> InventoryCleaner::findStackableItems() {
@@ -123,7 +102,7 @@ std::vector<int> InventoryCleaner::findUselessItems() {
 		std::sort(items.begin(), items.end(), [](const ItemStack* lhs, const ItemStack* rhs) {
 			ItemStack* current = const_cast<ItemStack*>(lhs);
 			ItemStack* other = const_cast<ItemStack*>(rhs);
-			return current->getItemPtr()->getAttackDamage() + (1.25f * current->getEnchantLevel(9)) > other->getItemPtr()->getAttackDamage() + (1.25f * other->getEnchantLevel(9));
+			return current->getItemPtr()->getAttackDamage() + (1.25f * current->getEnchantLevel(EnchantID::sharpness)) > other->getItemPtr()->getAttackDamage() + (1.25f * other->getEnchantLevel(EnchantID::sharpness));
 			});
 
 		bool hadTheBestItem = false;
@@ -133,8 +112,8 @@ std::vector<int> InventoryCleaner::findUselessItems() {
 			if (std::find(uselessItems.begin(), uselessItems.end(), i) != uselessItems.end())
 				continue;
 			ItemStack* itemStack = mc.getLocalPlayer()->getPlayerInventory()->inventory->getItemStack(i);
-			if (itemStack->item != nullptr && itemStack->getItemPtr()->getAttackDamage() + (1.25f * itemStack->getEnchantLevel(9)) > 1) {
-				if (itemStack->getItemPtr()->getAttackDamage() + (1.25f * itemStack->getEnchantLevel(9)) < bestItem->getItemPtr()->getAttackDamage() + (1.25f * bestItem->getEnchantLevel(9))) {
+			if (itemStack->item != nullptr && itemStack->getItemPtr()->getAttackDamage() + (1.25f * itemStack->getEnchantLevel(EnchantID::sharpness)) > 1) {
+				if (itemStack->getItemPtr()->getAttackDamage() + (1.25f * itemStack->getEnchantLevel(EnchantID::sharpness)) < bestItem->getItemPtr()->getAttackDamage() + (1.25f * bestItem->getEnchantLevel(EnchantID::sharpness))) {
 					uselessItems.push_back(i);
 				}
 				else {

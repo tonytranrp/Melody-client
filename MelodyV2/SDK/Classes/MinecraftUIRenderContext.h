@@ -31,6 +31,10 @@ public:
 	virtual void decreaseStencilRef(void);
 	virtual void resetStencilRef(void);
 	virtual void fillRectangleStencil(float*);
+	TextureData* getTexture(TextureData* texture, ResourceLocation* resourceLocation)
+	{
+		return MemoryUtils::CallVFunc<29, TextureData*, TextureData*, ResourceLocation*>(this, texture, resourceLocation);
+	};
 
 
 };
