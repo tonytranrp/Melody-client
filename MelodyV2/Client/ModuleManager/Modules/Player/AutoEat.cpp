@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "AutoEat.h"
 
 AutoEat::AutoEat() : Module("AutoEat", "Automatic eat when u holding food.", Category::PLAYER) {

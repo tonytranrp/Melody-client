@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #pragma once
 #include <Windows.h>
 #include "../Libs/ImGui/imgui.h"
@@ -102,6 +104,9 @@ struct UIColor {
 	}
 	ImU32 toImU32() const {
 		return IM_COL32(r, g, b, a);
+	}
+	MC_Color toMC_Color() const {  // Add 'const' here
+		return MC_Color((float)this->r / 255.f, (float)this->g / 255.f, (float)this->b / 255.f, (float)this->a / 255.f);
 	}
 	MC_Color toMC_Color() {
 		return MC_Color((float)this->r / 255.f, (float)this->g / 255.f, (float)this->b / 255.f, (float)this->a / 255.f);

@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Speed.h"
 
 Speed::Speed() : Module("Speed", "Don't ever take knockback again.", Category::MOVEMENT) {

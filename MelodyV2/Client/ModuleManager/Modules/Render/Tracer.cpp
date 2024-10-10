@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Tracer.h"
 
 Tracer::Tracer() : Module("Tracer", "Draws lines to ESP highlighted entities.", Category::RENDER) {

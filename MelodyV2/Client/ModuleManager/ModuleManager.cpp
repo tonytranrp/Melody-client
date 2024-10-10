@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "ModuleManager.h"
 #include "../Client.h"
 #include "Modules/Misc/AutoTools.h"
@@ -27,6 +29,7 @@ ModuleManager::ModuleManager() {
 		//moduleList.push_back(new AutoTools());
 		//Render
 		moduleList.push_back(new CameraNoClip());
+		moduleList.push_back(new Watermark());
 		moduleList.push_back(new ConicalHat());
 		moduleList.push_back(new CustomFov());
 		moduleList.push_back(new Fullbright());

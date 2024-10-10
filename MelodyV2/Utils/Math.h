@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #pragma once
 #define PI (3.1415927f)
 #include <algorithm>
@@ -189,9 +191,17 @@ struct Vec3 {
 
 		return angles;
 	}
+	Vec3<float> toFloat() const {
+		return Vec3<float>((float)x, (float)y, (float)z);
+	}
+
 	Vec3<T> normalize() const { float mag = this->magnitude(); return Vec3<T>(this->x / mag, this->y / mag, this->z / mag); }
 };
-
+struct Vec3Hash {
+	std::size_t operator()(const Vec3<int>& v) const {
+		return std::hash<int>()(v.x) ^ std::hash<int>()(v.y) ^ std::hash<int>()(v.z);
+	}
+};
 struct AABB {
 	Vec3<float> lower;
 	Vec3<float> upper;

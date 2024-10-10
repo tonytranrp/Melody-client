@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "AutoCrystal.h"
 #include "../Player/PacketMine.h"
 #include "../../../Client.h"
@@ -378,43 +380,47 @@ void AutoCrystal::onSendPacket(Packet* packet, bool& shouldCancel) {
 	}
 }
 
-void AutoCrystal::onRender(MinecraftUIRenderContext* renderCtx) {
-	int placed = 0;
-	for (CrystalPlacement& placement : placeList) {
-		Vec3<float> drawboxCenter = placement.placePos.toFloat().add(0.5f, 1.5f, 0.5f);
-		RenderUtils::drawBox(placement.placePos.toFloat(), UIColor(0, 255, 255, 50), UIColor(0, 255, 255, 255), 0.3f, true, false);
-		placed++;
 
-		if (placed >= multiPlace) break;
-	}
-}
 void AutoCrystal::onImGuiRender(ImDrawList* d) {
 	LocalPlayer* lp = mc.getLocalPlayer();
 	if (lp == nullptr) return;
 	if (lp->getLevel() == nullptr) return;
 	if (!mc.getClientInstance()->minecraftGame->canUseKeys) return;
+
 	static Colors* colorsMod = (Colors*)client->moduleMgr->getModule("Colors");
 	UIColor mainColor = colorsMod->getColor();
-	int placed = 0;
-	for (CrystalPlacement& placement : placeList) {
-		Vec2<float> pos;
-		if (ImGuiUtils::worldToScreen(placement.placePos.toFloat().add(0.f, 0.5f, 0.f), pos)) {
-			float dist = placement.placePos.toFloat().dist(mc.getLocalPlayer()->stateVectorComponent->pos);
 
-			float size = fmax(0.65f, 3.f / dist);
-			if (size > 2.f) size = 2.f;
-			std::string name = std::to_string(dam);
-			name = Utils::sanitize(name);
-			float textSize = 2.5f * size;
-			float textWidth = ImGuiUtils::getTextWidth(name, textSize);
-			float textHeight = ImGuiUtils::getTextHeight(textSize);
-			Vec2<float> textPos = Vec2<float>(pos.x - textWidth / 2.f, pos.y - textHeight / 2.f);
+	ImGuiUtils::setDrawList(d);
 
-			if (Damagerender) {
-				ImGuiUtils::drawText(textPos, name, UIColor(255, 255, 255, 255), textSize, true);
+	for (const CrystalPlacement& placement : placeList) {
+		Vec3<float> boxPos = placement.placePos.toFloat();
+		AABB blockAABB;
+		blockAABB.lower = boxPos;
+		blockAABB.upper = boxPos.add(1.f, 1.f, 1.f);
+
+		// Draw the box
+		ImGuiUtils::drawBox(blockAABB, UIColor(0, 255, 255, 50), UIColor(0, 255, 255, 255), 0.3f, true, false);
+
+		// Draw the damage text
+		if (Damagerender) {
+			Vec2<float> screenPos;
+			if (ImGuiUtils::worldToScreen(boxPos.add(0.5f, 1.5f, 0.5f), screenPos)) {
+				float dist = boxPos.dist(lp->stateVectorComponent->pos);
+				float size = std::min(2.f, std::max(0.65f, 3.f / dist));
+
+				std::string damageText = std::to_string(static_cast<int>(dam));
+				damageText = Utils::sanitize(damageText);
+
+				float textSize = 2.5f * size;
+				float textWidth = ImGuiUtils::getTextWidth(damageText, textSize);
+				float textHeight = ImGuiUtils::getTextHeight(textSize);
+
+				Vec2<float> textPos(screenPos.x - textWidth / 2.f, screenPos.y - textHeight / 2.f);
+				ImGuiUtils::drawText(textPos, damageText, UIColor(255, 255, 255, 255), textSize, true);
 			}
 		}
-		// Break loop after rendering the current placement
+
+		// Break the loop after rendering the first placement
 		break;
 	}
 }

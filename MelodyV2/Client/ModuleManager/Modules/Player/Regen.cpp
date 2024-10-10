@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Regen.h"
 #include "../../../Client.h"
 Regen::Regen() : Module("Regen", "NULL", Category::PLAYER) {

@@ -1,4 +1,7 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Surround.h"
+#include "../../../../Utils/TessRenderUtils.h"
 bool Placeabove = false;
 Surround::Surround() : Module("Surround", "Place blocks around you.", Category::PLAYER) {
 	addBoolCheck("Center", "NULL", &center);
@@ -99,103 +102,87 @@ Vec3<float> sideBlocks[5] = {
 };
 
 std::vector<Vec3<int>> renderPositions;
-
+#include <unordered_set>
 void Surround::onNormalTick(Actor* actor) {
-    LocalPlayer* localPlayer = mc.getLocalPlayer();
-    if (localPlayer == nullptr) return;
+	LocalPlayer* localPlayer = mc.getLocalPlayer();
+	if (localPlayer == nullptr) return;
 
-    Vec3<float> playerPos = localPlayer->getPosition()->floor().sub(Vec3<float>(0.f, 1.f, 0.f));
-    AABB playerAABB = *localPlayer->getAABB();
+	Vec3<float> playerPos = localPlayer->getPosition()->floor().sub(Vec3<float>(0.f, 1.f, 0.f));
+	AABB playerAABB = *localPlayer->getAABB();
 
-    for (Vec3<float> check : sideBlocks) {
-        Vec3<int> posToCheck = (playerPos.add(check)).toInt();
-        AABB blockAABB{ posToCheck.toFloat(), posToCheck.add(1, 1, 1).toFloat() };
+	std::unordered_set<Vec3<int>, Vec3Hash> blocksToPlace;
 
-        if (playerAABB.intersects(blockAABB)) {
-            tryBuildBlock(posToCheck.add(check.toInt()));
+	auto addBlockToPlace = [&](const Vec3<int>& pos) {
+		blocksToPlace.insert(pos);
+		};
+	 
+	for (const Vec3<float>& check : sideBlocks) {
+		Vec3<int> posToCheck = (playerPos.add(check)).toInt();
+		AABB blockAABB{ posToCheck.toFloat(), posToCheck.add(1, 1, 1).toFloat() };
 
-            for (int i : {-1, 1}) {
-                for (int j : {-1, 1}) {
-                    Vec3<int> sidePos = posToCheck.add(check.z * i, check.y, check.x * j);
-                    tryBuildBlock(sidePos);
-                    renderPositions.push_back(sidePos); // Store position for rendering
-                }
-            }
+		if (playerAABB.intersects(blockAABB)) {
+			addBlockToPlace(posToCheck.add(Vec3<int>(static_cast<int>(check.x), static_cast<int>(check.y), static_cast<int>(check.z))));
 
-            for (int i : {-1, 1}) {
-                for (int j : {-1, 1}) {
-                    Vec3<int> cornerPos = posToCheck.add(check.z * i, check.y, check.x * j);
-                    AABB cornerAABB{ cornerPos.toFloat(), cornerPos.add(1, 1, 1).toFloat() };
+			for (int i : {-1, 1}) {
+				for (int j : {-1, 1}) {
+					Vec3<int> sidePos = posToCheck.add(static_cast<int>(check.z) * i, static_cast<int>(check.y), static_cast<int>(check.x) * j);
+					addBlockToPlace(sidePos);
 
-                    if (playerAABB.intersects(cornerAABB)) {
-                        Vec3<int> adjustedPos = cornerPos.add(check.z * i, 0, check.x * j);
-                        tryBuildBlock(adjustedPos);
-                        renderPositions.push_back(adjustedPos); // Store position for rendering
-                    }
-                }
-            }
-        }
-        else {
-            tryBuildBlock(posToCheck);
-            renderPositions.push_back(posToCheck); // Store position for rendering
-        }
-    }
+					Vec3<int> cornerPos = posToCheck.add(static_cast<int>(check.z) * i, static_cast<int>(check.y), static_cast<int>(check.x) * j);
+					AABB cornerAABB{ cornerPos.toFloat(), cornerPos.add(1, 1, 1).toFloat() };
 
-    if (Placeabove) {
-        Vec3<int> abovePos = (playerPos.add(Vec3<float>(0.f, 2.f, 0.f))).toInt();
-        tryBuildBlock(abovePos);
-        renderPositions.push_back(abovePos); // Store position for rendering
-    }
+					if (playerAABB.intersects(cornerAABB)) {
+						Vec3<int> adjustedPos = cornerPos.add(static_cast<int>(check.z) * i, 0, static_cast<int>(check.x) * j);
+						addBlockToPlace(adjustedPos);
+					}
+				}
+			}
+		}
+		else {
+			addBlockToPlace(posToCheck);
+		}
+	}
 
-    if (disableComplete) {
-        this->setEnabled(false);
-    }
+	if (Placeabove) {
+		Vec3<int> abovePos = (playerPos.add(Vec3<float>(0.f, 2.f, 0.f))).toInt();
+		addBlockToPlace(abovePos);
+	}
+
+	for (const auto& pos : blocksToPlace) {
+		tryBuildBlock(pos);
+	}
+
+	renderPositions.assign(blocksToPlace.begin(), blocksToPlace.end());
+
+	if (disableComplete) {
+		this->setEnabled(false);
+	}
 }
+void Surround::onImGuiRender(ImDrawList* drawList) {
+	if (!render) return;
+	LocalPlayer* localPlayer = mc.getLocalPlayer();
+	if (localPlayer == nullptr) return;
+	if (!mc.getClientInstance()->minecraftGame->canUseKeys) return;
 
-void Surround::onRender(MinecraftUIRenderContext* ctx) {
-    LocalPlayer* localPlayer = mc.getLocalPlayer();
-    if (localPlayer == nullptr) return;
+	ImGuiUtils::setDrawList(drawList);
 
-    if (!render) return;
+	Vec3<float> playerPos = localPlayer->getPosition()->floor().sub(Vec3<float>(0.f, 1.f, 0.f));
 
-    Vec3<float> playerPos = *localPlayer->getPosition();
-    playerPos.y -= 1.f;
-    playerPos = playerPos.floor();
+	for (const auto& pos : renderPositions) {
+		AABB blockAABB;
+		blockAABB.lower = pos.toFloat();
+		blockAABB.upper = blockAABB.lower.add(1.f, 1.f, 1.f);
 
-    AABB playerAABB = *mc.getLocalPlayer()->getAABB();
+		ImGuiUtils::drawBox(blockAABB, color, lineColor, 1.0f, true, true);
+	}
 
-    for (Vec3<float> check : sideBlocks) {
-        Vec3<int> posToCheck = (playerPos.add(check)).toInt();
-        AABB blockAABB{ posToCheck.toFloat(), posToCheck.add(1, 1, 1).toFloat() };
-        if (playerAABB.intersects(blockAABB)) {
-            Vec3<int> extendedPos = posToCheck.add(check.toInt());
-            RenderUtils::drawBox(extendedPos.toFloat(), color, lineColor, 0.3f, true, false);
+	// Render the block under the player's feet
+	AABB feetAABB;
+	feetAABB.lower = playerPos.sub(Vec3<float>(0.f, 1.f, 0.f));
+	feetAABB.upper = feetAABB.lower.add(1.f, 1.f, 1.f);
 
-            for (int i : {-1, 1}) {
-                for (int j : {-1, 1}) {
-                    Vec3<int> sidePos = posToCheck.add(check.z * i, check.y, check.x * j);
-                    RenderUtils::drawBox(sidePos.toFloat(), color, lineColor, 0.3f, true, false);
-                }
-            }
-
-            for (int i : {-1, 1}) {
-                for (int j : {-1, 1}) {
-                    Vec3<int> cornerPos = posToCheck.add(check.z * i, check.y, check.x * j);
-                    AABB cornerAABB{ cornerPos.toFloat(), cornerPos.add(1, 1, 1).toFloat() };
-
-                    if (playerAABB.intersects(cornerAABB)) {
-                        Vec3<int> adjustedPos = cornerPos.add(check.z * i, 0, check.x * j);
-                        RenderUtils::drawBox(adjustedPos.toFloat(), color, lineColor, 0.3f, true, false);
-                    }
-                }
-            }
-        }
-        else {
-            RenderUtils::drawBox(posToCheck.toFloat(), color, lineColor, 0.3f, true, false);
-        }
-    }
+	ImGuiUtils::drawBox(feetAABB, color, lineColor, 1.0f, true, true);
 }
-
 void Surround::onEnable() {
     LocalPlayer* localPlayer = mc.getLocalPlayer();
     if (localPlayer == nullptr) return;

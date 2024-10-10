@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "AutoOffhand.h"
 
 AutoOffhand::AutoOffhand() : Module("Offhand", "Auto switch totems/shields to your offhand.", Category::PLAYER) {

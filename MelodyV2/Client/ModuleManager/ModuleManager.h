@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #pragma once
 #include <optional>
 #include <memory>
@@ -35,6 +37,7 @@
 #include "Modules/Render/NoRender.h"
 #include "Modules/Render/Tracer.h"
 #include "Modules/Render/ESP.h"
+#include "Modules/Render/WaterMark.h"
 #include "Modules/Render/AutoEmote.h"
 #include "Modules/Render/CustomSky.h"
 

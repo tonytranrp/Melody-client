@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "ChestStealler.h"
 
 ChestStealler::ChestStealler() : Module("ChestStealler", "Steals items from a chest", Category::PLAYER) {

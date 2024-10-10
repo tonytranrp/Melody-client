@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "AutoTntSpammer.h"
 
 AutoTntSpammer::AutoTntSpammer() : Module("AutoTntSpammer", "Auto attack players / mobs arround u.", Category::COMBAT) {

@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "ElytraFly.h"
 static float Speedy = 4.0f;
 ElytraFly::ElytraFly() : Module("ElytraFly", "Extend reach.", Category::MOVEMENT) {

@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "CustomFont.h"
 
 CustomFont::CustomFont() : Module("CustomFont", "Changes your current Client font.", Category::CLIENT) {

@@ -265,6 +265,7 @@
     <ClCompile Include="Client\ModuleManager\Modules\Render\NoHurtcam.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Render\CustomSky.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Render\NoRender.cpp" />
+	<ClCompile Include="Client\ModuleManager\Modules\Render\WaterMark.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Render\Tracer.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Render\AutoEmote.cpp" />
     <ClCompile Include="dllmain.cpp" />
@@ -284,6 +285,7 @@
     <ClCompile Include="SDK\Signatures.cpp" />
     <ClCompile Include="Utils\ImGuiUtils.cpp" />
     <ClCompile Include="Utils\RenderUtils.cpp" />
+	<ClCompile Include="Utils\TessRenderUtils.cpp" />
     <ClCompile Include="Utils\AudioSystem.cpp" />
     <ClCompile Include="Utils\TargetUtils.cpp" />
   </ItemGroup>
@@ -365,6 +367,7 @@
     <ClInclude Include="Client\ModuleManager\Modules\Misc\InventoryCleaner.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Misc\Anticrystal.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Module.h" />
+	<ClInclude Include="Client\ModuleManager\Modules\ModuleQueue.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\AutoSprint.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\Speed.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Movement\Fly.h" />
@@ -398,6 +401,7 @@
     <ClInclude Include="Client\ModuleManager\Modules\Render\NameTags.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Render\NoHurtcam.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Render\NoRender.h" />
+	<ClInclude Include="Client\ModuleManager\Modules\Render\WaterMark.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Render\Tracer.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Render\AutoEmote.h" />
     <ClInclude Include="Libs\Fonts\Mojangles.h" />
@@ -518,6 +522,7 @@
     <ClInclude Include="Utils\Math.h" />
     <ClInclude Include="Utils\MemoryUtils.h" />
     <ClInclude Include="Utils\RenderUtils.h" />
+	<ClInclude Include="Utils\TessRenderUtils.h" />
     <ClInclude Include="Utils\Timerutils.h" />
     <ClInclude Include="Utils\Utils.h" />
   </ItemGroup>

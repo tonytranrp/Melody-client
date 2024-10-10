@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #pragma once
 #include "../Module.h"
 #include <algorithm>
@@ -163,7 +165,7 @@ public:
 	int invTimer;
 	bool Crystalcounter = false;
 	AutoCrystal();
-	virtual void onRender(MinecraftUIRenderContext* renderCtx);
+	//virtual void onRender(MinecraftUIRenderContext* renderCtx);
 	virtual std::string getModName() override;
 	virtual void onEnable() override;
 	virtual void onDisable() override;

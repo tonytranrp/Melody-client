@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Timer.h"
 
 Timer::Timer() : Module("Timer", "Changes your tps(tick per seconds).", Category::MISC) {

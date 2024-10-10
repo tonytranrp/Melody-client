@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #pragma once
 #include "../../../../Utils/MemoryUtils.h"
 
@@ -8,7 +10,7 @@ protected:
 	using func_t = uint32_t(__fastcall*)(__int64);
 	static inline func_t func;
 
-	static unsigned int getCameraPerspectiveMode(__int64 a1) {
+	static unsigned int getCameraPerspectiveMode(__int64 a1) { //sub_14097C7A0
 		unsigned int result = func(a1);
 		mc.cameraPerspectiveMode = result;
 		return result;

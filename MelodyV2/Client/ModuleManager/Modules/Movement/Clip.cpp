@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Clip.h"
 
 Clip::Clip() : Module("Clip", "Clip onto walls, should never use with surround", Category::MOVEMENT) {

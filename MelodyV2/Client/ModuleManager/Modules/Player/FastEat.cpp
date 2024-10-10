@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "FastEat.h"
 
 FastEat::FastEat() : Module("FastEat", "Eat food faster.", Category::PLAYER) {

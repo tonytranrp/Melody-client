@@ -1,3 +1,5 @@
+// Created by Tony on 2024-10-10 10:01:54
+
 #include "Killaura.h"
 #include <cmath> // for std::atan2()
 Killaura::Killaura() : Module("Killaura", "Auto attack players / mobs arround u.", Category::COMBAT) {
