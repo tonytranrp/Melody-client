@@ -100,6 +100,13 @@ struct Vec3 {
 	Vec3<T> add(float a) {
 		return Vec3<T>(x + a, y + a, z + a);
 	}
+	Vec3<T> add(float a) const {
+		return Vec3<T>(x + a, y + a, z + a);
+	}
+	Vec3<int> add(int a) const {
+		return Vec3<int>(x + a, y + a, z + a);
+	}
+	
 	Vec3<T> add(float a, float b, float c) {
 		return Vec3<T>(x + a, y + b, z + c);
 	}
@@ -107,7 +114,13 @@ struct Vec3 {
 	Vec3<T> add(const Vec3<T>& v3) {
 		return Vec3<T>(x + v3.x, y + v3.y, z + v3.z);
 	}
-	
+	Vec3<T> addcons(const Vec3<T>& v3) const {  // Add this const version
+		return Vec3<T>(x + v3.x, y + v3.y, z + v3.z);
+	}
+
+	Vec3<T> addcons(T a, T b, T c) const {  // Add this const version
+		return Vec3<T>(x + a, y + b, z + c);
+	}
 	Vec3<T> mul(float a, float b, float c) {
 		return Vec3<T>(x * a, y * b, z * c);
 	}

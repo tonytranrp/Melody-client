@@ -5,8 +5,9 @@
 #include "../../Utils/Math.h"
 
 #include "ItemStack.h"
+#include "MinecraftPacket.h"
 #include "ComplexInventoryTransaction.h"
-enum class PacketID : int32_t {
+enum class PacketID : int {
 	KeepAlive = 0,
 	Login = 1,
 	PlayStatus = 2,
@@ -386,6 +387,24 @@ public:
 	int32_t ticksAlive; //0x0088
 	char pad_008C[44]; //0x008C
 };
+/*class LevelEventPacket : public Packet {
+public:
+	LevelEventPacket(Vec3<float> pos,int data) {
+		memset(this, 0x0, sizeof(LevelEventPacket));
+		using LevelEventPacketConstructor_t = void(__fastcall*)(LevelEventPacket*,Vec3<float>& ,int);
+		static LevelEventPacketConstructor_t LevelEventPacketConstructor = (LevelEventPacketConstructor_t)(findSig(Sigs::packet::InteractPacket_cctor));
+		LevelEventPacketConstructor(this, pos, data);
+	}
+public:
+	static const int EVENT_START_RAIN = 3001;
+	static const int EVENT_START_THUNDER = 3002;
+	static const int EVENT_STOP_RAIN = 3003;
+	static const int EVENT_STOP_THUNDER = 3004;
+
+	int eventId;
+	Vec3<float> pos;
+	int data;
+};*/
 enum class InteractAction
 {
 	RIGHT_CLICK = 1,
@@ -411,6 +430,9 @@ private:
 	char pad_003C[4]{}; //0x003C
 	char pad_0031[7]{}; //0x0031
 };
+
+
+
 class MobEquipmentPacket : public Packet {
 public:
 	MobEquipmentPacket(uint64_t runtimeId, ItemStack* itemStack, int hotbarSlot, int inventorySlot) {

@@ -218,6 +218,7 @@
     <ClCompile Include="Client\ModuleManager\Modules\Client\Notifications.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\AutoTntSpammer.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\AutoCrystal.cpp" />
+	<ClCompile Include="Client\ModuleManager\Modules\Combat\BedAura\BedAura.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\AutoMine.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\Reach.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Combat\Killaura.cpp" />
@@ -253,7 +254,7 @@
     <ClCompile Include="Client\ModuleManager\Modules\Player\FastEat.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\PacketMine.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\Scaffold.cpp" />
-    <ClCompile Include="Client\ModuleManager\Modules\Player\Surround.cpp" />
+    <ClCompile Include="Client\ModuleManager\Modules\Player\Surround\Surround.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Player\Swing.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Render\CameraNoClip.cpp" />
     <ClCompile Include="Client\ModuleManager\Modules\Render\ConicalHat.cpp" />
@@ -352,6 +353,7 @@
     <ClInclude Include="Client\ModuleManager\Modules\Client\Clients.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Client\Notifications.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\AutoCrystal.h" />
+	<ClInclude Include="Client\ModuleManager\Modules\Combat\BedAura\BedAura.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\AutoTntSpammer.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\AutoMine.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Combat\GravityAura.h" />
@@ -389,7 +391,8 @@
     <ClInclude Include="Client\ModuleManager\Modules\Player\Regen.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\AutoRespawn.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Player\Scaffold.h" />
-    <ClInclude Include="Client\ModuleManager\Modules\Player\Surround.h" />
+    <ClInclude Include="Client\ModuleManager\Modules\Player\Surround\Surround.h" />
+	
     <ClInclude Include="Client\ModuleManager\Modules\Player\Swing.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Render\ConicalHat.h" />
     <ClInclude Include="Client\ModuleManager\Modules\Render\CustomFov.h" />

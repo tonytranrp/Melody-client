@@ -12,6 +12,7 @@ ModuleManager::ModuleManager() {
 	{ // Init modules
 		//Combat
 		moduleList.push_back(new Killaura());
+		moduleList.push_back(new BedAura());
 		moduleList.push_back(new AutoCrystal());
 		moduleList.push_back(new Reach());
 		moduleList.push_back(new AutoAnvil());

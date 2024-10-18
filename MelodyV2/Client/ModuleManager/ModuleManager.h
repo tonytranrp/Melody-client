@@ -16,6 +16,7 @@
 #include "Modules/Combat/Reach.h"
 #include "Modules/Combat/GravityAura.h"
 #include "Modules/Combat/AutoAnvil.h"
+#include "Modules/Combat/BedAura/BedAura.h"
 #include "Modules/Combat/AutoTntSpammer.h"
 //Misc
 #include "Modules/Misc/NoPacket.h"
@@ -69,7 +70,7 @@
 #include "Modules/Player/Swing.h"
 #include "Modules/Player/AntiNigga.h"
 #include "Modules/Player/Scaffold.h"
-#include "Modules/Player/Surround.h"
+#include "Modules/Player/Surround/Surround.h"
 #include "Modules/Player/AutoOffhand.h"
 #include "Modules/Player/Regen.h"
 #include "Modules/Player/AutoRespawn.h"

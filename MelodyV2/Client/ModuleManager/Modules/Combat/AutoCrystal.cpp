@@ -364,9 +364,63 @@ void AutoCrystal::onSendPacket(Packet* packet, bool& shouldCancel) {
 
 
 	}
+	/*if (packet->getId() == PacketID::LevelEvent) {
+		auto* lep = reinterpret_cast<LevelEventPacket*>(packet);
+		if (lep->eventId == 3600) {
+			Vec3<float> pos = lep->pos;
+			auto* lp = mc.getLocalPlayer();
+			auto* region = lp->dimension->blockSource;
+			auto isObsidianOrBedrock = [](Block* b) { return b && (b->blockLegacy->blockName == "obsidian" || b->blockLegacy->blockName == "bedrock"); };
+			if (isObsidianOrBedrock(region->getBlock(Vec3<int>(pos.x, pos.y, pos.z)))) {
+				mc.DisplayClientMessage("blockbeing break at", GREEN, pos.x);
+				mc.DisplayClientMessage("blockbeing break at", GREEN, pos.y);
+				mc.DisplayClientMessage("blockbeing break at", GREEN, pos.z);
+			}
+
+		}
+	}*/
 
 	if (!shouldChangeID) return;
+	/*if (packet->getId() == (int)PacketID::LevelEvent)
+    {
+        auto lep = std::reinterpret_pointer_cast<LevelEventPacket>(packet);
+        if (lep->eventId == 3600)
+        {
+            Vector3 pos = lep->pos;
 
+            Vector3 closestPoint = AABB(pos, Vector3(1, 1, 1)).GetClosestPoint(*player->getPos());
+            float distance = closestPoint.Distance(*player->getPos());
+            if (distance > Distance.Value) return;
+
+            Block* block = Minecraft::ClientInstance->GetBlockSource()->getBlock(pos);
+            if (!block) return;
+
+            if (block->blockLegacy->id == 73 || block->blockLegacy->id == 74 && RedstoneOnly.Enabled)
+            {
+                // Add to queue
+                BlockQueue.emplace_back(BlockPosPair(pos, block), Misc::GetCurrentMs());
+            } else if (!RedstoneOnly.Enabled)
+            {
+                // Add to queue
+                BlockQueue.emplace_back(BlockPosPair(pos, block), Misc::GetCurrentMs());
+            }
+        }
+    }*/
+	/*if (packet->getId() == PacketID::LevelEvent) {
+		auto* lep = reinterpret_cast<LevelEventPacket*>(packet);
+		if (lep->eventId == 3600) {
+			Vec3<float> pos = lep->pos;
+			auto* lp = mc.getLocalPlayer();
+			auto* region = lp->dimension->blockSource;
+			auto isObsidianOrBedrock = [](Block* b) { return b && (b->blockLegacy->blockName == "obsidian" || b->blockLegacy->blockName == "bedrock"); };
+			if (isObsidianOrBedrock(region->getBlock(Vec3<int>(pos.x, pos.y, pos.z)))) {
+				mc.DisplayClientMessage("blockbeing break at", GREEN, pos.x);
+				mc.DisplayClientMessage("blockbeing break at", GREEN, pos.y);
+				mc.DisplayClientMessage("blockbeing break at", GREEN, pos.z);
+			}
+			
+		}
+	}*/
 	if (packet->getId() == PacketID::InventoryTransaction) {
 		auto* invPacket = reinterpret_cast<InventoryTransactionPacket*>(packet);
 		auto* invComplex = invPacket->transaction.get();
