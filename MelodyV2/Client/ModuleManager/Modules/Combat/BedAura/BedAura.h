@@ -3,6 +3,7 @@
 #include "../../../../../Utils/Math.h"
 
 #include <vector>
+
 enum class CardinalDirection {
     North,
     South,
@@ -13,36 +14,31 @@ enum class CardinalDirection {
 class BedAura : public Module {
 private:
     // Settings
-    int delay = 9;
-    bool strictDirection = false;
     float targetRange = 4.0f;
     float minDamage = 7.0f;
     float maxSelfDamage = 7.0f;
-    bool antiSuicide = true;
-    bool autoSwitch = true;
-    bool pauseOnEat = true;
-    bool pauseOnDrink = true;
-    bool pauseOnMine = true;
+    bool targetMobs = false;
     bool render = true;
     UIColor sideColor = UIColor(15, 255, 211, 75);
     UIColor lineColor = UIColor(15, 255, 211, 255);
 
     // Internal variables
-    CardinalDirection direction;
-    Player* target;
-    Vec3<int> placePos;
-    Vec3<int> breakPos;
-    int timer;
+    CardinalDirection bestDirection;
+    Actor* target;
+    Vec3<int> bestPlacePos;
 
     // Helper functions
     bool canPlaceBed(const Vec3<int>& pos);
-    Vec3<int> findPlace(Player* target);
-    Vec3<int> findBreak();
-    bool placeBed(const Vec3<int>& pos);
-    void breakBed(const Vec3<int>& pos);
-    float calculateBedDamage(Player* player, const Vec3<float>& bedPos);
-    Player* getClosestPlayer(float range);
-    int findBedInHotbar();
+    void findBestPlacement();
+    float calculateBedDamage(Actor* actor, const Vec3<float>& bedPos);
+    Actor* getClosestTarget(float range);
+
+    // Damage calculation helper functions
+    float computeDistancePercentage(const Vec3<float>& bedPos, Actor* target, float explosionRadius);
+    float computeImpact(const Vec3<float>& bedPos, Actor* target, float distPercent);
+    float calculateBaseDamage(float impact, float explosionRadius);
+    std::pair<int, float> getArmorDetails(Actor* target);
+    float applyArmorReduction(float damage, int armorPoints, float epf);
 
 public:
     BedAura();

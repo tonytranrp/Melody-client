@@ -219,10 +219,14 @@ enum class PacketID : int {
 	SetHudPacket = 308,
 	EndId = 309
 };
-
+struct PacketHandlerDispatcherInstance {
+	uintptr_t** vTable;
+};
 class Packet {
 private:
 	char pad_0x0[0x30]; // 0x0
+public:
+	PacketHandlerDispatcherInstance* dispatcher;
 public:
 	PacketID getId() {
 		return MemoryUtils::CallVFunc<1, PacketID>(this);
